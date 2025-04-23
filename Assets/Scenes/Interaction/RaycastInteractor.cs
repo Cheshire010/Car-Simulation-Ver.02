@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class RaycastInteractor : MonoBehaviour
 {
+    public static RaycastInteractor Instance { get; private set; }
+
     [Header("상호작용 설정")]
     public string targetTag = "Interactable"; // 감지할 태그 이름
     public float detectDistance = 2f;         // 감지 거리(미터)
@@ -9,7 +11,18 @@ public class RaycastInteractor : MonoBehaviour
 
     private Renderer lastRenderer;            // 마지막으로 하이라이트된 오브젝트의 Renderer
     private Color originalColor;              // 원래 색상 저장
-
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
     void Update()
     {
         HandleRaycastInteraction();
