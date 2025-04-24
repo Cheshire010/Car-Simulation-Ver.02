@@ -1,10 +1,16 @@
 using UnityEngine;
+using System.Collections;
 
 [RequireComponent(typeof(Animator))]
 public class BonnetInteraction : MonoBehaviour
 {
     Animator animator;
-    bool isOpen = false;  // IdleClosed 상태로 시작
+    bool isOpen = false;  // 현재 열림 상태인지
+    bool isBusy = false;  // 모션 중 클릭 잠금
+
+    [Header("Lock Durations (sec)")]
+    public float openDuration = 1.0f;  // Open_Bonnet 애니메이션 길이
+    public float closeDuration = 1.0f;  // Close_Bonnet 애니메이션 길이
 
     void Awake()
     {
@@ -13,22 +19,34 @@ public class BonnetInteraction : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out var hit, 100f))
-            {
-                if (hit.collider.transform.IsChildOf(transform))
-                {
-                    if (isOpen)
-                        animator.SetTrigger("Close_Bonnet");
-                    else
-                        animator.SetTrigger("Open_Bonnet");
+        if (isBusy) return;                 // 모션 중이면 무시
+        if (!Input.GetMouseButtonDown(0)) return;
 
-                    isOpen = !isOpen;
-                    Debug.Log(isOpen ? "Opened bonnet" : "Closed bonnet");
-                }
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out var hit, 100f) &&
+            hit.collider.transform.IsChildOf(transform))
+        {
+            if (isOpen)
+            {
+                animator.SetTrigger("Close_Bonnet");
+                StartCoroutine(MotionLock(closeDuration));
             }
+            else
+            {
+                animator.SetTrigger("Open_Bonnet");
+                StartCoroutine(MotionLock(openDuration));
+            }
+
+            isOpen = !isOpen;
+            Debug.Log(isOpen ? "Opened bonnet" : "Closed bonnet");
         }
+    }
+
+    // duration 동안 클릭 잠금 → 끝나면 풀어줌
+    IEnumerator MotionLock(float duration)
+    {
+        isBusy = true;
+        yield return new WaitForSeconds(duration);
+        isBusy = false;
     }
 }
