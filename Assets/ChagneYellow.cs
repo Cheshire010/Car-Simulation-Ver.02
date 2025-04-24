@@ -19,10 +19,15 @@ public class ChangeYellow : MonoBehaviour, IInteractable
     public string[] nearbyMessages;
     private int currentIndex = 0;
     private bool isNearby = false;
-    private bool hasActivatedNearby = false; // 중복 실행 방지
+    private bool hasActivatedNearby = false;
 
     [Header("설정")]
-    public float detectRange = 5f;  // 근처 감지 거리
+    public float detectRange = 5f;
+
+    [Header("메시지 자동 넘김 설정")]
+    public float messageInterval = 2f;  // 메시지 간 간격 (초)
+    private float messageTimer = 0f;
+    private bool isShowingMessages = false;
 
     void Start()
     {
@@ -34,17 +39,28 @@ public class ChangeYellow : MonoBehaviour, IInteractable
     {
         CheckPlayerNearby();
 
-        if (isNearby && Input.GetMouseButtonDown(0))
+        // 자동 메시지 넘기기
+        if (isShowingMessages)
         {
-            // 왼쪽 클릭 시 UI 끄기
+            messageTimer += Time.deltaTime;
+            if (messageTimer >= messageInterval)
+            {
+                messageTimer = 0f;
+                ShowNextNearbyMessage();
+            }
+        }
+
+        if (isNearby && Input.GetKeyDown(KeyCode.Space))
+        {
             isNearby = false;
             if (nearbyPanel != null) nearbyPanel.SetActive(false);
+            isShowingMessages = false;
         }
     }
 
     void CheckPlayerNearby()
     {
-        if (hasActivatedNearby) return; // 이미 한 번 보여줬으면 다시 안함
+        if (hasActivatedNearby) return;
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player == null) return;
@@ -58,12 +74,40 @@ public class ChangeYellow : MonoBehaviour, IInteractable
             currentIndex = 0;
 
             if (nearbyPanel != null) nearbyPanel.SetActive(true);
+            isShowingMessages = true;
+            messageTimer = 0f;
             ShowNextNearbyMessage();
+        }
+    }
+
+    void ShowNextNearbyMessage()
+    {
+        if (nearbyMessages == null || nearbyMessages.Length == 0 || nearbyText == null) return;
+
+        if (currentIndex < nearbyMessages.Length)
+        {
+            nearbyText.text = nearbyMessages[currentIndex];
+            currentIndex++;
+        }
+        else
+        {
+            // 마지막 메시지까지 보여준 후 자동 닫기
+            isNearby = false;
+            isShowingMessages = false;
+            if (nearbyPanel != null) nearbyPanel.SetActive(false);
         }
     }
 
     public void Interact()
     {
+        // 근처 UI가 아직 열려 있으면 닫기
+        if (nearbyPanel != null && nearbyPanel.activeSelf)
+        {
+            nearbyPanel.SetActive(false);
+            isNearby = false;
+            isShowingMessages = false;
+        }
+
         if (subtitleText != null && !subtitleText.enabled)
         {
             subtitleText.enabled = true;
@@ -73,7 +117,7 @@ public class ChangeYellow : MonoBehaviour, IInteractable
 
         if (subtitleText != null)
         {
-            subtitleText.text = $"진행도 : {progress}%";
+            subtitleText.text = $"공기압 : {progress}%";
         }
 
         if (progress == 80 && !hasTriggeredChat)
@@ -90,21 +134,6 @@ public class ChangeYellow : MonoBehaviour, IInteractable
                     hasTriggeredChat = true;
                 }
             }
-        }
-    }
-
-    void ShowNextNearbyMessage()
-    {
-        if (nearbyMessages == null || nearbyMessages.Length == 0 || nearbyText == null) return;
-
-        if (currentIndex < nearbyMessages.Length)
-        {
-            nearbyText.text = nearbyMessages[currentIndex];
-            currentIndex++;
-        }
-        else
-        {
-            // 마지막 메시지까지 봤으면 더 이상 자동 진행 없음
         }
     }
 }

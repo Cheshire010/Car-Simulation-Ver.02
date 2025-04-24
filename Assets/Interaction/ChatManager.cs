@@ -66,7 +66,7 @@ public class ChatManager : MonoBehaviour
         if (!isChatting) return;
 
         // [¼öÁ¤] GetMouseButtonDown ¡æ GetKeyDown(KeyCode.Mouse0)
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             ShowNextChat();
         }
