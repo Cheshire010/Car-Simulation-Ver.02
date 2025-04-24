@@ -1,35 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviour
 {
-    // 싱글톤 인스턴스
-    public static MenuManager Instance { get; private set; }
-
-    // 일시정지 메뉴 UI
+    public  MenuManager Instance { get; private set; }
     public GameObject pauseMenuUI;
+    public bool GameIsPaused { get; private set; } = false;
 
-    // 일시정지 상태
-    public static bool GameIsPaused { get; private set; } = false;
-
-    void Awake()
+    void OnDestroy()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        SceneManager.sceneLoaded -= OnSceneLoaded; // 씬 로드 시 이벤트 제거
     }
 
     void Start()
     {
-        if (pauseMenuUI != null)
-            pauseMenuUI.SetActive(false);
+        // 씬 로드 시 자동으로 호출되는 이벤트를 추가합니다.
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     void Update()
@@ -65,18 +51,34 @@ public class MenuManager : MonoBehaviour
         GameIsPaused = false;
     }
 
-    // "계속하기" 버튼에서 호출
     public void OnContinueButton()
     {
         ResumeGame();
     }
 
-    // "나가기" 버튼에서 호출
     public void OnExitButton()
     {
-        Application.Quit();
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#endif
+        SceneManager.LoadScene("Lobby_Scene");
+    }
+
+    // 씬이 로드될 때 자동으로 pauseMenuUI를 비활성화
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // 새로운 씬이 로드되면, pauseMenuUI를 비활성화하고 게임 상태를 다시 진행 상태로 설정
+        if (pauseMenuUI != null)
+            pauseMenuUI.SetActive(false);
+
+        GameIsPaused = false; // 일시 정지 상태 초기화
+    }
+
+    public void RestartScene()
+    {
+        Scene currentScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(currentScene.name);
+    }
+
+    public void LoadTitleScene()
+    {
+        SceneManager.LoadScene("Title_Scene"); // "TitleScene"을 타이틀 씬 이름으로 바꿔줘
     }
 }

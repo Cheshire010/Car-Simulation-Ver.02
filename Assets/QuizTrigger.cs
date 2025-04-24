@@ -36,9 +36,9 @@ public class QuizTrigger : MonoBehaviour
 
     void LockUIState(bool isLocked)
     {
-        // 플레이어 움직임 제한
-        if (PlayerMove.Instance != null)
-            PlayerMove.Instance.enabled = !isLocked;
+        //// 플레이어 움직임 제한
+        //if (PlayerMove.Instance != null)
+        //    PlayerMove.Instance.enabled = !isLocked;
 
         // 레이캐스트 상호작용 제한
         if (RaycastInteractor.Instance != null)

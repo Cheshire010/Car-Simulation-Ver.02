@@ -1,24 +1,137 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
-public class InteractionUITrigger : MonoBehaviour, RaycastInteractor.IInteractable
+public class PlayerMove : MonoBehaviour
 {
-    public GameObject uiPanel; // 띄울 UI 패널 (Canvas 안에 있는 패널 등)
+    public float moveSpeed = 5f;
+    public float mouseSensitivity = 1500f;
+    public float jumpForce = 12f;
 
-    public void Interact()
+    private float xRotation = 0f;
+    private Rigidbody rb;
+
+    private bool isGrounded = true;
+
+    private bool canLook = false;
+    private float lookDelay = 1f;
+
+    MenuManager MenuManager;
+
+    void Awake()
     {
-        if (uiPanel != null)
-            uiPanel.SetActive(true);
-
-        // 플레이어 움직임 비활성화
-        if (PlayerMove.Instance != null)
+        MenuManager = GameObject.Find("MenuManager").GetComponent<MenuManager>();
+        rb = GetComponent<Rigidbody>();
+        if (rb == null)
         {
-            PlayerMove.Instance.enabled = false;
+            rb = gameObject.AddComponent<Rigidbody>();
+        }
+        rb.freezeRotation = true;
+        rb.mass = 1f;
+        rb.useGravity = true;
+
+        if (GetComponent<Collider>() == null)
+        {
+            gameObject.AddComponent<CapsuleCollider>();
         }
 
-        // 마우스 커서 보이게 + 잠금 해제
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;
+        Camera mainCamera = Camera.main;
+        if (mainCamera != null)
+        {
+            mainCamera.transform.SetParent(transform);
+            mainCamera.transform.localPosition = new Vector3(0, 0.5f, 0);
+            mainCamera.transform.localRotation = Quaternion.Euler(0, 0, 0);
+        }
+
+        transform.rotation = Quaternion.Euler(0, 0, 0);
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        // 씬 로드시 위치 초기화를 위해 이벤트 등록
+        SceneManager.sceneLoaded += OnSceneLoaded;
+
+        StartCoroutine(EnableLookAfterDelay());
+    }
+
+    private IEnumerator EnableLookAfterDelay()
+    {
+        canLook = false;
+        xRotation = 0f;
+        transform.rotation = Quaternion.Euler(0, 0, 0);
+        if (Camera.main != null)
+            Camera.main.transform.localRotation = Quaternion.Euler(0, 0, 0);
+
+        yield return new WaitForSeconds(lookDelay);
+        canLook = true;
+    }
+
+    void Update()
+    {
+        if (MenuManager.GameIsPaused == false)
+            return;
+
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
+
+        Vector3 move = transform.TransformDirection(new Vector3(h, 0, v)) * moveSpeed;
+        Vector3 velocity = rb.velocity;
+        velocity.x = move.x;
+        velocity.z = move.z;
+        rb.velocity = velocity;
+
+        if (canLook)
+        {
+            float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+            float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+
+            xRotation -= mouseY;
+            xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+
+            if (Camera.main != null)
+                Camera.main.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+
+            transform.Rotate(Vector3.up * mouseX);
+        }
+        else
+        {
+            xRotation = 0f;
+            transform.rotation = Quaternion.Euler(0, 0, 0);
+            if (Camera.main != null)
+                Camera.main.transform.localRotation = Quaternion.Euler(0, 0, 0);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            isGrounded = false;
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = true;
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = false;
+        }
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        transform.position = new Vector3(-2.0f, 1.5f, 1.5f); // 씬마다 초기 위치
+        rb.velocity = Vector3.zero;
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 }

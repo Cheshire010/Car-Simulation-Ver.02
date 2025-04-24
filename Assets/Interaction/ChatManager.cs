@@ -54,8 +54,8 @@ public class ChatManager : MonoBehaviour
         IsChatting = true;
         ShowNextChat();
 
-        if (PlayerMove.Instance != null)
-            PlayerMove.Instance.enabled = false;
+        //if (PlayerMove.Instance != null)
+        //    PlayerMove.Instance.enabled = false;
 
         if (RaycastInteractor.Instance != null)
             RaycastInteractor.Instance.enabled = false;
@@ -90,8 +90,8 @@ public class ChatManager : MonoBehaviour
         isChatting = false;
         IsChatting = false;
 
-        if (PlayerMove.Instance != null)
-            PlayerMove.Instance.enabled = true;
+        //if (PlayerMove.Instance != null)
+        //    PlayerMove.Instance.enabled = true;
 
         if (RaycastInteractor.Instance != null)
             RaycastInteractor.Instance.enabled = true;
