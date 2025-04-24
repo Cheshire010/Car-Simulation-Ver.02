@@ -3,33 +3,17 @@ using System.Collections;
 
 public class PlayerMove : MonoBehaviour
 {
-    public static PlayerMove Instance { get; private set; }
-
     public float moveSpeed = 5f;
     public float mouseSensitivity = 1500f;
     public float jumpForce = 12f;
 
     private float xRotation = 0f;
     private Rigidbody rb;
-
     private bool isGrounded = true;
 
     // [추가] 1초간 정면 고정 관련 변수
     private bool canLook = false;
     private float lookDelay = 1f;
-
-    void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
 
     void Start()
     {

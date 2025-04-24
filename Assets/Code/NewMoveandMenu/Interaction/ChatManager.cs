@@ -4,59 +4,74 @@ using System.Collections.Generic;
 
 public class ChatManager : MonoBehaviour
 {
+    [System.Serializable]
+    public class ChatData
+    {
+        public string eventName;
+        public string[] messages;
+    }
+
     [Header("UI 설정")]
     public GameObject chatPanel;
     public Text chatText;
-    public Text pressText; // [추가] "좌클릭을 눌러 진행" 텍스트
+    public Text pressText;
 
     [Header("채팅 데이터")]
-    public string[] chatMessages;
+    public List<ChatData> chatDatas = new List<ChatData>();
     public bool playOnStart = true;
 
-    private Queue<string> chatQueue = new Queue<string>();
+    [Header("참조 설정")]
+    public PlayerMove playerController;
+    public RaycastInteractor raycastInteractor;
+
+    private Dictionary<string, string[]> chatDictionary = new Dictionary<string, string[]>();
+    private Queue<string> currentChat = new Queue<string>();
     private bool isChatting = false;
 
     public static bool IsChatting { get; private set; }
 
     void Start()
     {
-        chatPanel.SetActive(false);
-        pressText.gameObject.SetActive(false); // [추가] 시작 시 비활성화
-
-        if (playOnStart && chatMessages.Length > 0)
+        foreach (ChatData data in chatDatas)
         {
-            StartChat(chatMessages);
+            chatDictionary.Add(data.eventName, data.messages);
+        }
+
+        chatPanel.SetActive(false);
+        pressText.gameObject.SetActive(false);
+
+        // 자동 참조 (옵션)
+        if (playerController == null) playerController = FindObjectOfType<PlayerMove>();
+        if (raycastInteractor == null) raycastInteractor = FindObjectOfType<RaycastInteractor>();
+
+        if (playOnStart && chatDictionary.ContainsKey("StartEvent"))
+        {
+            StartChat("StartEvent");
         }
     }
 
-    public void StartChat(string[] messages)
+    public void StartChat(string eventName, string[] customMessages = null)
     {
+        string[] messages = customMessages ?? (chatDictionary.ContainsKey(eventName) ? chatDictionary[eventName] : null);
         if (messages == null || messages.Length == 0) return;
 
-        chatQueue.Clear();
-        foreach (string msg in messages)
-        {
-            chatQueue.Enqueue(msg);
-        }
+        currentChat.Clear();
+        foreach (string msg in messages) currentChat.Enqueue(msg);
 
         chatPanel.SetActive(true);
-        pressText.gameObject.SetActive(true); // [추가] 활성화
+        pressText.gameObject.SetActive(true);
         isChatting = true;
         IsChatting = true;
         ShowNextChat();
 
-        if (PlayerMove.Instance != null)
-            PlayerMove.Instance.enabled = false;
-
-        if (RaycastInteractor.Instance != null)
-            RaycastInteractor.Instance.enabled = false;
+        SetPlayerControl(false);
     }
+
     void Update()
     {
         if (!isChatting) return;
 
-        // [수정] GetMouseButtonDown → GetKeyDown(KeyCode.Mouse0)
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             ShowNextChat();
         }
@@ -64,34 +79,37 @@ public class ChatManager : MonoBehaviour
 
     private void ShowNextChat()
     {
-        if (chatQueue.Count == 0)
+        if (currentChat.Count == 0)
         {
             EndChat();
             return;
         }
-
-        chatText.text = chatQueue.Dequeue();
-
-        // [변경] 마지막 메시지에서도 pressText 유지
-        /* 삭제된 부분
-        if (chatQueue.Count == 0)
-        {
-            pressText.gameObject.SetActive(false);
-        }
-        */
+        chatText.text = currentChat.Dequeue();
     }
+
+    public event System.Action OnChatEnd;
 
     private void EndChat()
     {
         chatPanel.SetActive(false);
-        pressText.gameObject.SetActive(false); // 채팅 종료 시 숨김
+        pressText.gameObject.SetActive(false);
         isChatting = false;
         IsChatting = false;
 
-        if (PlayerMove.Instance != null)
-            PlayerMove.Instance.enabled = true;
+        SetPlayerControl(true);
+        OnChatEnd?.Invoke();
+    }
 
-        if (RaycastInteractor.Instance != null)
-            RaycastInteractor.Instance.enabled = true;
+    private void SetPlayerControl(bool enable)
+    {
+        if (playerController != null)
+            playerController.enabled = enable;
+        else
+            Debug.LogWarning("PlayerMove 참조 없음");
+
+        if (raycastInteractor != null)
+            raycastInteractor.enabled = enable;
+        else
+            Debug.LogWarning("RaycastInteractor 참조 없음");
     }
 }

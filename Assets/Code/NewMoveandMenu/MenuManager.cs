@@ -4,27 +4,11 @@ using UnityEngine;
 
 public class MenuManager : MonoBehaviour
 {
-    // 싱글톤 인스턴스
-    public static MenuManager Instance { get; private set; }
-
     // 일시정지 메뉴 UI
     public GameObject pauseMenuUI;
 
     // 일시정지 상태
     public static bool GameIsPaused { get; private set; } = false;
-
-    void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
 
     void Start()
     {
