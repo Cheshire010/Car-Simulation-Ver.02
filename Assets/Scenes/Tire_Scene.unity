@@ -1366,6 +1366,7 @@ MonoBehaviour:
   - "\uD0C0\uC774\uC5B4\uC758 \uC801\uC815 \uACF5\uAE30\uC555\uC740 70~80%\uC785\uB2C8\uB2E4"
   - "\uC55E\uCABD\uC73C\uB85C \uC774\uB3D9\uD558\uC154\uC11C \uD034\uC988\uB97C \uD480\uC5B4\uC8FC\uC138\uC694"
 <<<<<<< HEAD
+<<<<<<< HEAD
   messagesToSendSounds:
   - {fileID: 8300000, guid: 3cce7dbc31f8fd54a895a872f48002c6, type: 3}
   - {fileID: 8300000, guid: 882d27ed7beddc746a015c6abb27f1f5, type: 3}
@@ -1375,15 +1376,20 @@ MonoBehaviour:
 >>>>>>> Stashed changes
 =======
 >>>>>>> parent of db6e388 (04-25)
+=======
+>>>>>>> parent of db6e388 (04-25)
   nearbyPanel: {fileID: 8188186924352984317}
   nearbyText: {fileID: 5366432109223408074}
   nearbyMessages:
   - "\uACF5\uAE30\uC555 \uC8FC\uC785\uAE30\uB97C \uD074\uB9AD\uD558\uC5EC \uACF5\uAE30\uC555\uC744
     \uCC44\uC6B0\uC138\uC694"
 <<<<<<< HEAD
+<<<<<<< HEAD
   nearbyMessagesSounds:
   - {fileID: 8300000, guid: 128550fb82c877f4d8c249226f5b8a65, type: 3}
 <<<<<<< Updated upstream
+=======
+>>>>>>> parent of db6e388 (04-25)
 =======
 >>>>>>> parent of db6e388 (04-25)
   detectRange: 2
