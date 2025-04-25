@@ -9228,6 +9228,10 @@ PrefabInstance:
       value: Washer water
       objectReference: {fileID: 0}
     - target: {fileID: 944907291799449475, guid: 528acef2500d4a445bf6baf62b9363ef, type: 3}
+      propertyPath: audioSource
+      value: 
+      objectReference: {fileID: 7132349996890056408}
+    - target: {fileID: 944907291799449475, guid: 528acef2500d4a445bf6baf62b9363ef, type: 3}
       propertyPath: chatManager
       value: 
       objectReference: {fileID: 5586370192645547998}
@@ -9239,6 +9243,31 @@ PrefabInstance:
       propertyPath: particleEffect
       value: 
       objectReference: {fileID: 1989019947}
+    - target: {fileID: 944907291799449475, guid: 528acef2500d4a445bf6baf62b9363ef, type: 3}
+      propertyPath: soundClips.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 944907291799449475, guid: 528acef2500d4a445bf6baf62b9363ef, type: 3}
+      propertyPath: soundClips.Array.data[0]
+      value: 
+      objectReference: {fileID: 8300000, guid: ca466b4dc8cfb6a49afa3070597c83c9, type: 3}
+    - target: {fileID: 944907291799449475, guid: 528acef2500d4a445bf6baf62b9363ef, type: 3}
+      propertyPath: soundClips.Array.data[1]
+      value: 
+      objectReference: {fileID: 8300000, guid: 5a89ac829cde94c4a9af045be608c238, type: 3}
+    - target: {fileID: 944907291799449475, guid: 528acef2500d4a445bf6baf62b9363ef, type: 3}
+      propertyPath: completionMessage.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 944907291799449475, guid: 528acef2500d4a445bf6baf62b9363ef, type: 3}
+      propertyPath: completionMessage.Array.data[0]
+      value: "\uC6CC\uC154\uC561 \uBCF4\uCDA9\uC774 \uB05D\uB0AC\uC2B5\uB2C8\uB2E4"
+      objectReference: {fileID: 0}
+    - target: {fileID: 944907291799449475, guid: 528acef2500d4a445bf6baf62b9363ef, type: 3}
+      propertyPath: completionMessage.Array.data[1]
+      value: "\uC55E\uCABD\uC73C\uB85C \uC774\uB3D9\uD558\uC154\uC11C \uD034\uC988\uB97C
+        \uD480\uC5B4\uC8FC\uC138\uC694"
+      objectReference: {fileID: 0}
     - target: {fileID: 1375775122487259211, guid: 528acef2500d4a445bf6baf62b9363ef, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.758
@@ -10588,9 +10617,17 @@ MonoBehaviour:
   interactionCooldown: 0.5
   chatManager: {fileID: 5586370192645547998}
   useItemDialogue:
-  - "\uD6C4\uB4DC\uAC00 \uC5F4\uB838\uC2B5\uB2C8\uB2E4!"
-  - "\uCC28\uB7C9 \uBD80\uD488\uC744 \uD655\uC778\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
-  - "\uC138\uCC99\uC744 \uC2DC\uC791\uD558\uC138\uC694."
+  - "\uC6CC\uC154\uC561\uC744 \uB123\uC744 \uCC28\uB840\uC785\uB2C8\uB2E4"
+  - "\uC606\uC758 \uCC2C\uC7A5\uC5D0\uC11C \uC6CC\uC154\uC561\uC744 \uAC00\uC838\uC624\uC138\uC694"
+  - "\uC6CC\uC154\uC561 \uC6A9\uB7C9\uC740 \uCC28\uB7C9\uB9C8\uB2E4 \uB2E4\uB974\uC9C0\uB9CC"
+  - "\uC18C\uD615\uCC28\uB294 2~3\uB9AC\uD130, \uC911\uB300\uD615\uCC28\uB294 4~6\uB9AC\uD130
+    \uC815\uB3C4 \uB4E4\uC5B4\uAC11\uB2C8\uB2E4"
+  audioSource: {fileID: 7132349996890056408}
+  soundClips:
+  - {fileID: 8300000, guid: 9be2b17ab44a5cc43b703f00c5dc307e, type: 3}
+  - {fileID: 8300000, guid: a56ca4c4b12dc0f4cb154a9ee0c9b719, type: 3}
+  - {fileID: 8300000, guid: e11c22b9eba46514bb1b60945625c5c7, type: 3}
+  - {fileID: 8300000, guid: c5c9960d48ab6014d8c6347caabdb626, type: 3}
 --- !u!1 &4086688304837491232
 GameObject:
   m_ObjectHideFlags: 0
@@ -11900,10 +11937,26 @@ MonoBehaviour:
   chatText: {fileID: 126586025}
   pressText: {fileID: 14260633}
   chatMessages:
-  - hhhh
-  - gggg
-  - fffff
-  soundClips: []
+  - "\uC774\uBC88\uC5D0\uB294 \uC6CC\uC154\uC561 \uBCF4\uCDA9\uC744 \uD574\uBCF4\uACA0\uC2B5\uB2C8\uB2E4"
+  - "\uCC28\uB7C9\uC758 \uC720\uB9AC\uC5D0 \uBB3B\uC740 \uC774\uBB3C\uC9C8\uC744
+    \uC81C\uAC70\uD558\uAE30 \uC704\uD574\uC120"
+  - "\uC6CC\uC154\uC561\uC774 \uBD84\uC0AC\uB418\uC5B4 \uC720\uB9AC\uB97C \uB2E6\uC544\uC90D\uB2C8\uB2E4"
+  - "\uC790\uB3D9\uCC28\uC758 \uCCAD\uACB0 \uC720\uC9C0 \uBC0F \uC548\uC804\uC2DC\uC57C\uD655\uBCF4\uB97C
+    \uC704\uD574\uC11C\uB294"
+  - "\uC6CC\uC154\uC561\uC744 \uC8FC\uAE30\uC801\uC73C\uB85C \uCC44\uC6CC\uC8FC\uB294\uAC83\uC774
+    \uC88B\uC2B5\uB2C8\uB2E4"
+  - "\uC6CC\uC154\uC561\uC740 \uC778\uD654\uC131\uC774 \uAC15\uD558\uB2C8 \uD654\uC5FC\uACFC
+    \uBD88\uAF43\uC744 \uBA40\uB9AC\uD558\uB294\uAC83\uC774 \uC88B\uC2B5\uB2C8\uB2E4"
+  - "\uB610\uD55C \uC720\uB3C5\uC131\uC774 \uC788\uC73C\uB2C8 \uC808\uB300 \uB9C8\uC2DC\uC9C0
+    \uC54A\uB3C4\uB85D \uC8FC\uC758\uD558\uC2DC\uB294\uAC83\uC774 \uC88B\uC2B5\uB2C8\uB2E4"
+  soundClips:
+  - {fileID: 8300000, guid: 2a1cc8ef62927c04aab44abc8fbf87aa, type: 3}
+  - {fileID: 8300000, guid: 69ddb3160a6abad4aa3d1f585fcbbe7e, type: 3}
+  - {fileID: 8300000, guid: 1a95566ac396c9646ac9ebdf9ecca25b, type: 3}
+  - {fileID: 8300000, guid: 01594a7ab5d36c445b490d5e3d4ef689, type: 3}
+  - {fileID: 8300000, guid: 4f951680961a63b4297735fc7b60e398, type: 3}
+  - {fileID: 8300000, guid: d3606cff6737ea5449550c70dc6e1c31, type: 3}
+  - {fileID: 8300000, guid: fa3b1dbab6d316f43b483d88b5d214d9, type: 3}
   playOnStart: 1
 --- !u!33 &5593278019410729089
 MeshFilter:

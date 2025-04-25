@@ -1,6 +1,6 @@
 using UnityEngine;
-using static TireScene_RayCast;
 using UnityEngine.UI;
+using static TireScene_RayCast;
 
 public class AirGun_Interaction : MonoBehaviour, IInteractable
 {
@@ -29,6 +29,14 @@ public class AirGun_Interaction : MonoBehaviour, IInteractable
     private float messageTimer = 0f;
     private bool isShowingMessages = false;
 
+    [Header("근처 접근 메시지 사운드")]
+    public AudioSource nearbyAudioSource;
+    public AudioClip[] nearbyAudioClips;
+
+    [Header("대화 메시지 사운드")]
+    public AudioSource chatAudioSource;
+    public AudioClip[] chatAudioClips;
+
     void Start()
     {
         if (subtitleText != null) subtitleText.enabled = false;
@@ -55,6 +63,7 @@ public class AirGun_Interaction : MonoBehaviour, IInteractable
             isNearby = false;
             if (nearbyPanel != null) nearbyPanel.SetActive(false);
             isShowingMessages = false;
+            StopNearbySound();
         }
     }
 
@@ -87,6 +96,7 @@ public class AirGun_Interaction : MonoBehaviour, IInteractable
         if (currentIndex < nearbyMessages.Length)
         {
             nearbyText.text = nearbyMessages[currentIndex];
+            PlayNearbySound(currentIndex); // 근처 접근 사운드
             currentIndex++;
         }
         else
@@ -95,7 +105,50 @@ public class AirGun_Interaction : MonoBehaviour, IInteractable
             isNearby = false;
             isShowingMessages = false;
             if (nearbyPanel != null) nearbyPanel.SetActive(false);
+            StopNearbySound();
         }
+    }
+
+    void PlayNearbySound(int index)
+    {
+        if (nearbyAudioSource == null || nearbyAudioClips == null || index >= nearbyAudioClips.Length) return;
+
+        if (nearbyAudioSource.isPlaying)
+            nearbyAudioSource.Stop();
+
+        nearbyAudioSource.clip = nearbyAudioClips[index];
+        nearbyAudioSource.Play();
+    }
+
+    void StopNearbySound()
+    {
+        if (nearbyAudioSource != null && nearbyAudioSource.isPlaying)
+            nearbyAudioSource.Stop();
+    }
+
+    // 대화 메시지 재생 (TireScene_ChatManager에서 호출해야 함)
+    public void ShowNextChatMessage(int chatIndex)
+    {
+        // 대화 메시지 UI 처리(예시)
+        // chatText.text = messagesToSend[chatIndex];
+        PlayChatSound(chatIndex);
+    }
+
+    void PlayChatSound(int index)
+    {
+        if (chatAudioSource == null || chatAudioClips == null || index >= chatAudioClips.Length) return;
+
+        if (chatAudioSource.isPlaying)
+            chatAudioSource.Stop();
+
+        chatAudioSource.clip = chatAudioClips[index];
+        chatAudioSource.Play();
+    }
+
+    void StopChatSound()
+    {
+        if (chatAudioSource != null && chatAudioSource.isPlaying)
+            chatAudioSource.Stop();
     }
 
     public void Interact()
@@ -106,6 +159,7 @@ public class AirGun_Interaction : MonoBehaviour, IInteractable
             nearbyPanel.SetActive(false);
             isNearby = false;
             isShowingMessages = false;
+            StopNearbySound();
         }
 
         if (subtitleText != null && !subtitleText.enabled)
@@ -130,7 +184,7 @@ public class AirGun_Interaction : MonoBehaviour, IInteractable
                 TireScene_ChatManager chatManager = FindObjectOfType<TireScene_ChatManager>();
                 if (chatManager != null && messagesToSend.Length > 0)
                 {
-                    chatManager.StartChat(messagesToSend);
+                    chatManager.StartChat(messagesToSend); // this를 넘겨서 ShowNextChatMessage 호출 가능
                     hasTriggeredChat = true;
                 }
             }

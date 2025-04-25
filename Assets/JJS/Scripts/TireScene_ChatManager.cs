@@ -2,70 +2,71 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using static TireScene_RayCast;
-using System;
 
 public class TireScene_ChatManager : MonoBehaviour
 {
     [Header("UI 설정")]
     public GameObject chatPanel;
     public Text chatText;
-    public Text pressText; // [추가] "좌클릭을 눌러 진행" 텍스트
+    public Text pressText;
 
     [Header("채팅 데이터")]
     public string[] chatMessages;
+    public AudioClip[] soundClips;
     public bool playOnStart = true;
 
     private Queue<string> chatQueue = new Queue<string>();
+    private AudioSource audioSource;
     private bool isChatting = false;
+    private int currentSoundIndex = 0;
 
     public static bool IsChatting { get; private set; }
 
+    void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
+
     void Start()
     {
-        // 채팅 관련 UI 비활성화
         chatPanel.SetActive(false);
-        pressText.gameObject.SetActive(false); // [추가] 시작 시 비활성화
+        pressText.gameObject.SetActive(false);
 
-        // 게임 시작 시 채팅 메시지가 비어 있지 않으면 자동으로 채팅 시작
         if (playOnStart && chatMessages.Length > 0)
         {
-            Debug.Log("StartChat() 호출");  // 디버깅 확인
             StartChat(chatMessages);
-        }
-        else
-        {
-            Debug.LogWarning("Chat messages are empty or playOnStart is false!");
         }
     }
 
     public void StartChat(string[] messages)
     {
-        if (messages == null || messages.Length == 0) return;
+        if (messages.Length != soundClips.Length)
+        {
+            Debug.LogWarning("메시지와 사운드 클립 개수 불일치!");
+        }
 
         chatQueue.Clear();
+        currentSoundIndex = 0;
+
         foreach (string msg in messages)
         {
             chatQueue.Enqueue(msg);
         }
 
         chatPanel.SetActive(true);
-        pressText.gameObject.SetActive(true); // [추가] 활성화
+        pressText.gameObject.SetActive(true);
         isChatting = true;
         IsChatting = true;
         ShowNextChat();
 
-        //if (PlayerMove.Instance != null)
-        //    PlayerMove.Instance.enabled = false;
-
-        if (TireScene_RayCast.Instance != null)
-            TireScene_RayCast.Instance.enabled = false;
+        if (JYJ_RaycastInteractor.Instance != null)
+            JYJ_RaycastInteractor.Instance.enabled = false;
     }
 
     void Update()
     {
         if (!isChatting) return;
 
-        // [수정] GetMouseButtonDown → GetKeyDown(KeyCode.Mouse0)
         if (Input.GetKeyDown(KeyCode.Space))
         {
             ShowNextChat();
@@ -81,19 +82,29 @@ public class TireScene_ChatManager : MonoBehaviour
         }
 
         chatText.text = chatQueue.Dequeue();
+        PlayCurrentSound();
+    }
+
+    void PlayCurrentSound()
+    {
+        if (soundClips == null || currentSoundIndex >= soundClips.Length) return;
+
+        if (audioSource.isPlaying)
+            audioSource.Stop();
+
+        audioSource.clip = soundClips[currentSoundIndex];
+        audioSource.Play();
+        currentSoundIndex++;
     }
 
     private void EndChat()
     {
         chatPanel.SetActive(false);
-        pressText.gameObject.SetActive(false); // 채팅 종료 시 숨김
+        pressText.gameObject.SetActive(false);
         isChatting = false;
         IsChatting = false;
 
-        //if (PlayerMove.Instance != null)
-        //    PlayerMove.Instance.enabled = true;
-
-        if (TireScene_RayCast.Instance != null)
-            TireScene_RayCast.Instance.enabled = true;
+        if (JYJ_RaycastInteractor.Instance != null)
+            JYJ_RaycastInteractor.Instance.enabled = true;
     }
 }
