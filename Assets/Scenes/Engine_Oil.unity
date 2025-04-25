@@ -1421,6 +1421,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Door
       objectReference: {fileID: 0}
+    - target: {fileID: 8730744198865455036, guid: 64065474654f3194b84bc92fcd77e948, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 8730744198865455036, guid: 64065474654f3194b84bc92fcd77e948, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.435
+      objectReference: {fileID: 0}
     - target: {fileID: 8884761596371928318, guid: 64065474654f3194b84bc92fcd77e948, type: 3}
       propertyPath: m_TagString
       value: Ground
@@ -1612,7 +1620,7 @@ Transform:
   m_GameObject: {fileID: 619638387}
   serializedVersion: 2
   m_LocalRotation: {x: 0.00693116, y: 0.707073, z: 0.70707273, w: -0.0069311615}
-  m_LocalPosition: {x: 3.9957106, y: 0.17863405, z: -1.724}
+  m_LocalPosition: {x: 4.04, y: 0.17863405, z: -1.7594622}
   m_LocalScale: {x: 1.5470527, y: 1.5470527, z: 1.5470527}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4161,7 +4169,7 @@ Transform:
   m_GameObject: {fileID: 2103929872}
   serializedVersion: 2
   m_LocalRotation: {x: 0.00693116, y: 0.707073, z: 0.70707273, w: -0.0069311615}
-  m_LocalPosition: {x: 3.9957106, y: 0.17863405, z: -2.026}
+  m_LocalPosition: {x: 4.04, y: 0.17863405, z: -2.0614624}
   m_LocalScale: {x: 1.5470527, y: 1.5470527, z: 1.5470527}
   m_ConstrainProportionsScale: 0
   m_Children:
