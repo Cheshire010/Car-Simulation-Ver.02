@@ -14,20 +14,20 @@ public class EngineOilPickup : MonoBehaviour
     public float pickupRange = 3f;
 
     // 원래 테이블 위 로컬 위치, 회전, 스케일 저장
-    Vector3    tableLocalPos;
+    Vector3 tableLocalPos;
     Quaternion tableLocalRot;
-    Vector3    tableLocalScale;
+    Vector3 tableLocalScale;
 
     Rigidbody rb;
-    Collider  col;
-    bool      isHeld = false;
+    Collider col;
+    bool isHeld = false;
 
     void Awake()
     {
-        rb  = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
-        col.isTrigger  = false;
-        rb.useGravity  = true;
+        col.isTrigger = false;
+        rb.useGravity = true;
         rb.isKinematic = false;
 
         if (tableParent == null)
@@ -40,8 +40,8 @@ public class EngineOilPickup : MonoBehaviour
         var oldParent = transform.parent;
         transform.SetParent(tableParent, true);
 
-        tableLocalPos   = transform.localPosition;
-        tableLocalRot   = transform.localRotation;
+        tableLocalPos = transform.localPosition;
+        tableLocalRot = transform.localRotation;
         tableLocalScale = transform.localScale;
 
         // 원래대로
@@ -53,7 +53,7 @@ public class EngineOilPickup : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             if (!isHeld) TryPickup();
-            else         Drop();
+            else Drop();
         }
     }
 
@@ -64,16 +64,16 @@ public class EngineOilPickup : MonoBehaviour
             hit.collider == col &&
             holdPoint != null)
         {
-            isHeld        = true;
+            isHeld = true;
             rb.isKinematic = true;
-            rb.useGravity  = false;
-            col.isTrigger  = true;
+            rb.useGravity = false;
+            col.isTrigger = true;
 
             // 카메라 앞 HoldPoint 자식으로 붙인다
             transform.SetParent(holdPoint, false);
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
-            transform.localScale    = Vector3.one;  // HoldPoint 에 스케일 영향받지 않도록
+            transform.localScale = Vector3.one;  // HoldPoint 에 스케일 영향받지 않도록
 
             Debug.Log("Picked up");
         }
@@ -81,10 +81,10 @@ public class EngineOilPickup : MonoBehaviour
 
     void Drop()
     {
-        isHeld        = false;
+        isHeld = false;
         rb.isKinematic = false;
-        rb.useGravity  = true;
-        col.isTrigger  = false;
+        rb.useGravity = true;
+        col.isTrigger = false;
 
         // 다시 테이블 선반 자식으로 붙이고, 
         transform.SetParent(tableParent, false);
@@ -92,7 +92,7 @@ public class EngineOilPickup : MonoBehaviour
         // 저장해 둔 로컬 값으로 복원
         transform.localPosition = tableLocalPos;
         transform.localRotation = tableLocalRot;
-        transform.localScale    = tableLocalScale;
+        transform.localScale = tableLocalScale;
 
         Debug.Log("Dropped back to table");
     }
