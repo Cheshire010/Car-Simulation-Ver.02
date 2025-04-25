@@ -1,5 +1,9 @@
 fileFormatVersion: 2
-guid: bed7faa9c66c8a04099d846bd151a68d
+<<<<<<<< HEAD:Assets/Scenes/JYJScene.unity.meta
+guid: 39f00c312e3c767488bff52a5cbbbd75
+========
+guid: 31e449e66f8ba4c4ba36ac9fced8aeb6
+>>>>>>>> 최중민:Assets/Scenes/Engine_Oil.unity.meta
 DefaultImporter:
   externalObjects: {}
   userData: 
