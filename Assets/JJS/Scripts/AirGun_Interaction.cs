@@ -1,8 +1,8 @@
 using UnityEngine;
-using static RaycastInteractor;
+using static TireScene_RayCast;
 using UnityEngine.UI;
 
-public class ChangeYellow : MonoBehaviour, IInteractable
+public class AirGun_Interaction : MonoBehaviour, IInteractable
 {
     public Text subtitleText;  // 진행도 텍스트
     private int progress = 30;
@@ -125,9 +125,9 @@ public class ChangeYellow : MonoBehaviour, IInteractable
             if (objectToHide != null)
                 objectToHide.SetActive(false);
 
-            if (!ChatManager.IsChatting)
+            if (!TireScene_ChatManager.IsChatting)
             {
-                ChatManager chatManager = FindObjectOfType<ChatManager>();
+                TireScene_ChatManager chatManager = FindObjectOfType<TireScene_ChatManager>();
                 if (chatManager != null && messagesToSend.Length > 0)
                 {
                     chatManager.StartChat(messagesToSend);

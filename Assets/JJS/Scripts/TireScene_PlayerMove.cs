@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-public class PlayerMove : MonoBehaviour
+public class TireScene_PlayerMove : MonoBehaviour
 {
     public float moveSpeed = 5f;
     public float mouseSensitivity = 1500f;
@@ -15,12 +15,10 @@ public class PlayerMove : MonoBehaviour
 
     private bool canLook = false;
     private float lookDelay = 1f;
-
-    MenuManager MenuManager;
-
+    TireScene_MenuManager MenuManager;
     void Awake()
     {
-        MenuManager = GameObject.Find("MenuManager").GetComponent<MenuManager>();
+        MenuManager = GameObject.Find("MenuManager").GetComponent<TireScene_MenuManager>();
         rb = GetComponent<Rigidbody>();
         if (rb == null)
         {
@@ -48,7 +46,7 @@ public class PlayerMove : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        // 씬 로드시 위치 초기화를 위해 이벤트 등록
+        // 씬 로드 이벤트 등록
         SceneManager.sceneLoaded += OnSceneLoaded;
 
         StartCoroutine(EnableLookAfterDelay());
@@ -68,8 +66,11 @@ public class PlayerMove : MonoBehaviour
 
     void Update()
     {
-        if (MenuManager.GameIsPaused == false)
+        if (MenuManager.GameIsPaused)
+        {
+            // 게임이 일시 정지되었을 때, 플레이어의 이동과 마우스 회전 비활성화
             return;
+        }
 
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
@@ -124,14 +125,16 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
+    // 씬이 로드될 때 위치 초기화
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        transform.position = new Vector3(-2.0f, 1.5f, 1.5f); // 씬마다 초기 위치
-        rb.velocity = Vector3.zero;
+        transform.position = new Vector3(-2.0f, 1.5f, 1.5f); // 원하는 위치로 바꿔도 됩니다
+        rb.velocity = Vector3.zero; // 이동 중이던 속도 제거
     }
 
     private void OnDestroy()
     {
+        // 이벤트 해제
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 }

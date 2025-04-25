@@ -41,8 +41,8 @@ public class QuizTrigger : MonoBehaviour
         //    PlayerMove.Instance.enabled = !isLocked;
 
         // 레이캐스트 상호작용 제한
-        if (RaycastInteractor.Instance != null)
-            RaycastInteractor.Instance.enabled = !isLocked;
+        if (TireScene_RayCast.Instance != null)
+            TireScene_RayCast.Instance.enabled = !isLocked;
 
         // 커서 설정
         Cursor.lockState = isLocked ? CursorLockMode.None : CursorLockMode.Locked;

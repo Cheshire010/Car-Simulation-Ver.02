@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class RaycastInteractor : MonoBehaviour
+public class TireScene_RayCast : MonoBehaviour
 {
-    public static RaycastInteractor Instance { get; private set; }
+    public static TireScene_RayCast Instance { get; private set; }
 
     [Header("상호작용 설정")]
     public string targetTag = "Interactable"; // 감지할 태그 이름

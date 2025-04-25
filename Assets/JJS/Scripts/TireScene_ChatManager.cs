@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using static RaycastInteractor;
+using static TireScene_RayCast;
 using System;
 
-public class ChatManager : MonoBehaviour
+public class TireScene_ChatManager : MonoBehaviour
 {
     [Header("UI ¼³Á¤")]
     public GameObject chatPanel;
@@ -57,8 +57,8 @@ public class ChatManager : MonoBehaviour
         //if (PlayerMove.Instance != null)
         //    PlayerMove.Instance.enabled = false;
 
-        if (RaycastInteractor.Instance != null)
-            RaycastInteractor.Instance.enabled = false;
+        if (TireScene_RayCast.Instance != null)
+            TireScene_RayCast.Instance.enabled = false;
     }
 
     void Update()
@@ -93,7 +93,7 @@ public class ChatManager : MonoBehaviour
         //if (PlayerMove.Instance != null)
         //    PlayerMove.Instance.enabled = true;
 
-        if (RaycastInteractor.Instance != null)
-            RaycastInteractor.Instance.enabled = true;
+        if (TireScene_RayCast.Instance != null)
+            TireScene_RayCast.Instance.enabled = true;
     }
 }
