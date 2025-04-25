@@ -42,7 +42,7 @@ public class InteractionEnbayCap : MonoBehaviour, IInteractable
     {
         if (isFirstOpen && isHoodOpen)
         {
-            chatManager.StartChat(useItemDialogue);
+            chatManager.StartChat("UseItem", useItemDialogue);
             isFirstOpen = false;
         }
     }

@@ -157,24 +157,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 250028376}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b45160f1008de50489697e7ea10dcdaf, type: 3}
+  m_Script: {fileID: 11500000, guid: 1633db220dcca0941a031db06a7ff2b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   subtitleText: {fileID: 2135887937}
   objectToHide: {fileID: 275771411}
   messagesToSend:
-  - "\uD0C0\uC774\uC5B4\uC758 \uC801\uC815 \uACF5\uAE30\uC555\uC740 70~80%\uC785\uB2C8\uB2E4."
+  - "\uD0C0\uC774\uC5B4\uC758 \uC801\uC815 \uACF5\uAE30\uC555\uC740 70~80%\uC785\uB2C8\uB2E4"
   - "\uC55E\uCABD\uC73C\uB85C \uC774\uB3D9\uD558\uC154\uC11C \uD034\uC988\uB97C \uD480\uC5B4\uC8FC\uC138\uC694"
-  messagesToSendSounds:
-  - {fileID: 8300000, guid: 3cce7dbc31f8fd54a895a872f48002c6, type: 3}
-  - {fileID: 8300000, guid: 882d27ed7beddc746a015c6abb27f1f5, type: 3}
   nearbyPanel: {fileID: 8188186924352984317}
   nearbyText: {fileID: 5366432109223408074}
   nearbyMessages:
   - "\uACF5\uAE30\uC555 \uC8FC\uC785\uAE30\uB97C \uD074\uB9AD\uD558\uC5EC \uACF5\uAE30\uC555\uC744
     \uCC44\uC6B0\uC138\uC694"
-  nearbyMessagesSounds:
-  - {fileID: 8300000, guid: 128550fb82c877f4d8c249226f5b8a65, type: 3}
   detectRange: 2
   messageInterval: 2
 --- !u!1 &275771411 stripped
@@ -432,15 +427,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1262740b6e086d543882bad8130647f7, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1262740b6e086d543882bad8130647f7, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1262740b6e086d543882bad8130647f7, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1262740b6e086d543882bad8130647f7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -990,6 +985,111 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.0007038079, y: 0.08588572, z: 0.035105485}
   m_Center: {x: -0.039937913, y: 0.0077444525, z: 0.01750051}
+--- !u!1 &1346778843
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1346778847}
+  - component: {fileID: 1346778846}
+  - component: {fileID: 1346778845}
+  - component: {fileID: 1346778844}
+  m_Layer: 0
+  m_Name: Cube
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!65 &1346778844
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1346778843}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1346778845
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1346778843}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1346778846
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1346778843}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1346778847
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1346778843}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1395548269
 GameObject:
   m_ObjectHideFlags: 0
@@ -1640,7 +1740,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8699525375594383009}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54601447517e4664d938d374979bf68e, type: 3}
+  m_Script: {fileID: 11500000, guid: 81fa578a61dbf5347865216a47544646, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
@@ -1813,7 +1913,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4163665451187165948}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1914b36ae658274d98c4c5d4bda1ef5, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cf00d82290b7c64e978ba08873a84fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   chatPanel: {fileID: 8188186924352984317}
@@ -1824,22 +1924,13 @@ MonoBehaviour:
   - "\uC774\uBC88\uC5D0\uB294 \uD0C0\uC774\uC5B4 \uACF5\uAE30\uC555 \uC8FC\uC785\uC744
     \uD574\uBCFC\uAC81\uB2C8\uB2E4"
   - "\uD0C0\uC774\uC5B4 \uACF5\uAE30\uC555 \uCCB4\uD06C\uB294 \uC6D4 1\uD68C"
-  - "\uB610\uB294 \uC8FC\uD589\uAC70\uB9AC 1\uB9CCkm\uB9C8\uB2E4 \uD574\uC8FC\uB294
-    \uAC83\uC774 \uC88B\uC2B5\uB2C8\uB2E4"
-  - "\uC801\uC815 \uACF5\uAE30\uC555\uC744 \uC720\uC9C0\uD558\uB294 \uAC83\uC774
-    \uC911\uC694\uD569\uB2C8\uB2E4"
-  - "\uC720\uC9C0\uC2DC \uD0C0\uC774\uC5B4\uC758 \uC218\uBA85 \uC5F0\uC7A5 \uBC0F
-    \uC5F0\uBE44 \uC808\uAC10\uC774 \uAC00\uB2A5\uD569\uB2C8\uB2E4"
+  - "\uB610\uB294 \uC8FC\uD589\uAC70\uB9AC 1\uB9CCkm\uB9C8\uB2E4 \uD574\uC8FC\uB294\uAC83\uC774
+    \uC88B\uC2B5\uB2C8\uB2E4"
+  - "\uC801\uC815 \uACF5\uAE30\uC555\uC744 \uC720\uC9C0\uD558\uB294\uAC83\uC774 \uC911\uC694\uD569\uB2C8\uB2E4"
+  - "\uC720\uC9C0 \uC2DC \uD0C0\uC774\uC5B4\uC758 \uC218\uBA85\uC5F0\uC7A5 \uBC0F
+    \uC5F0\uBE44\uC808\uAC10\uC774 \uAC00\uB2A5\uD569\uB2C8\uB2E4"
   - "\uC6C0\uC9C1\uC5EC\uC11C \uACF5\uAE30\uC555 \uC8FC\uC785\uAE30 \uADFC\uCC98\uB85C
     \uAC00\uC138\uC694"
-  soundClips:
-  - {fileID: 8300000, guid: 26352e32c8f836749878b5953743d8cb, type: 3}
-  - {fileID: 8300000, guid: 1d1e5d8e5519fe04086afcf666425d92, type: 3}
-  - {fileID: 8300000, guid: a56e790546e871b42a22332dc6764531, type: 3}
-  - {fileID: 8300000, guid: 6c8b36b42a612f2409a97e5dd7333d1e, type: 3}
-  - {fileID: 8300000, guid: 44c41316e96e5334a962bc7e29168b1c, type: 3}
-  - {fileID: 8300000, guid: 27cc9cd567ea6f243a214dda97c50404, type: 3}
-  - {fileID: 8300000, guid: dc34bef6ef88432439fb29c6127435df, type: 3}
   playOnStart: 1
 --- !u!224 &1733448907764695690
 RectTransform:
@@ -2654,7 +2745,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2236541216836796717}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1023bf67f1153a741a6b781a5ba9adc3, type: 3}
+  m_Script: {fileID: 11500000, guid: 3755e0afea70eda42860509423408442, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   pauseMenuUI: {fileID: 1595967105384832775}
@@ -2851,3 +2942,4 @@ SceneRoots:
   - {fileID: 464849607}
   - {fileID: 4239573172639569626}
   - {fileID: 2135543112}
+  - {fileID: 1346778847}

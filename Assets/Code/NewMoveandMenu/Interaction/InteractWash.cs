@@ -52,7 +52,7 @@ public class InteractWash : MonoBehaviour, IInteractable
         // 채팅 메시지 트리거
         if (chatManager != null)
         {
-            chatManager.StartChat(completionMessage);
+            chatManager.StartChat("WashComplete", completionMessage);
         }
         else
         {
