@@ -3,9 +3,8 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-// using static RaycastInteractor; → 이 줄 삭제
 
-public class Quad : MonoBehaviour, RaycastInteractor.IInteractable
+public class QuizTrigger : MonoBehaviour, TireScene_RayCast.IInteractable
 {
     [System.Serializable]
     public class QuizQuestion
@@ -25,8 +24,8 @@ public class Quad : MonoBehaviour, RaycastInteractor.IInteractable
     public List<QuizQuestion> questionPool = new List<QuizQuestion>();
 
     [Header("참조 설정")]
-    public PlayerMove playerController;
-    public RaycastInteractor raycastInteractor;
+    public TireScene_PlayerMove playerController;
+    public TireScene_RayCast raycastInteractor;
 
     private List<QuizQuestion> selectedQuestions = new List<QuizQuestion>();
     private int currentQuestionIndex = 0;
@@ -40,14 +39,14 @@ public class Quad : MonoBehaviour, RaycastInteractor.IInteractable
 
         if (playerController == null)
         {
-            playerController = FindObjectOfType<PlayerMove>();
+            playerController = FindObjectOfType<TireScene_PlayerMove>();
             if (playerController == null)
                 Debug.LogWarning("PlayerMove 컴포넌트를 찾을 수 없습니다!");
         }
 
         if (raycastInteractor == null)
         {
-            raycastInteractor = FindObjectOfType<RaycastInteractor>();
+            raycastInteractor = FindObjectOfType<TireScene_RayCast>();
             if (raycastInteractor == null)
                 Debug.LogWarning("RaycastInteractor 컴포넌트를 찾을 수 없습니다!");
         }

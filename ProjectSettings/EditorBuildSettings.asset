@@ -15,6 +15,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Tire_Scene.unity
     guid: 03e0633380a79644daf3c93ad16fd2ca
   - enabled: 1
-    path: Assets/Scenes/JYJScene.unity
+    path: Assets/JYJ/JYJScene.unity
     guid: bed7faa9c66c8a04099d846bd151a68d
   m_configObjects: {}

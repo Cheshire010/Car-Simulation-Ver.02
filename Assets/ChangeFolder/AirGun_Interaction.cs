@@ -1,27 +1,22 @@
 using UnityEngine;
 using UnityEngine.UI;
-using static JYJ_RaycastInteractor;
+using static TireScene_RayCast;
 
-[RequireComponent(typeof(AudioSource))]
-public class ChangeYellow : MonoBehaviour, IInteractable
+public class AirGun_Interaction : MonoBehaviour, IInteractable
 {
+    public Text chatText;
     public Text subtitleText;  // 진행도 텍스트
     private int progress = 30;
     public GameObject objectToHide;
 
     [Header("대화 메시지")]
-    [TextArea]
     public string[] messagesToSend;
-    public AudioClip[] messagesToSendSounds; // 메시지별 사운드
-
     private bool hasTriggeredChat = false;
 
     [Header("근처 접근 시 표시할 UI")]
     public GameObject nearbyPanel;
     public Text nearbyText;
     public string[] nearbyMessages;
-    public AudioClip[] nearbyMessagesSounds; // 근접 메시지별 사운드
-
     private int currentIndex = 0;
     private bool isNearby = false;
     private bool hasActivatedNearby = false;
@@ -34,12 +29,13 @@ public class ChangeYellow : MonoBehaviour, IInteractable
     private float messageTimer = 0f;
     private bool isShowingMessages = false;
 
-    private AudioSource audioSource;
+    [Header("근처 접근 메시지 사운드")]
+    public AudioSource nearbyAudioSource;
+    public AudioClip[] nearbyAudioClips;
 
-    void Awake()
-    {
-        audioSource = GetComponent<AudioSource>();
-    }
+    [Header("대화 메시지 사운드")]
+    public AudioSource chatAudioSource;
+    public AudioClip[] chatAudioClips;
 
     void Start()
     {
@@ -64,10 +60,10 @@ public class ChangeYellow : MonoBehaviour, IInteractable
 
         if (isNearby && Input.GetKeyDown(KeyCode.Space))
         {
-            audioSource.Stop(); // UI 닫을 때 사운드 중단
             isNearby = false;
             if (nearbyPanel != null) nearbyPanel.SetActive(false);
             isShowingMessages = false;
+            StopNearbySound();
         }
     }
 
@@ -100,24 +96,61 @@ public class ChangeYellow : MonoBehaviour, IInteractable
         if (currentIndex < nearbyMessages.Length)
         {
             nearbyText.text = nearbyMessages[currentIndex];
-
-            //  현재 재생 중인 사운드 중단 후 다음 사운드 재생
-            audioSource.Stop();
-
-            if (nearbyMessagesSounds != null && currentIndex < nearbyMessagesSounds.Length && nearbyMessagesSounds[currentIndex] != null)
-            {
-                audioSource.PlayOneShot(nearbyMessagesSounds[currentIndex]);
-            }
+            PlayNearbySound(currentIndex); // 근처 접근 사운드
             currentIndex++;
         }
         else
         {
             // 마지막 메시지까지 보여준 후 자동 닫기
-            audioSource.Stop(); // 패널 닫힐 때 사운드 중단
             isNearby = false;
             isShowingMessages = false;
             if (nearbyPanel != null) nearbyPanel.SetActive(false);
+            StopNearbySound();
         }
+    }
+
+    void PlayNearbySound(int index)
+    {
+        if (nearbyAudioSource == null || nearbyAudioClips == null || index >= nearbyAudioClips.Length) return;
+
+        if (nearbyAudioSource.isPlaying)
+            nearbyAudioSource.Stop();
+
+        nearbyAudioSource.clip = nearbyAudioClips[index];
+        nearbyAudioSource.Play();
+    }
+
+    void StopNearbySound()
+    {
+        if (nearbyAudioSource != null && nearbyAudioSource.isPlaying)
+            nearbyAudioSource.Stop();
+    }
+
+    // 대화 메시지 재생 (TireScene_ChatManager에서 호출해야 함)
+    public void ShowNextChatMessage(int chatIndex)
+    {
+        if (messagesToSend != null && chatIndex < messagesToSend.Length)
+        {
+            chatText.text = messagesToSend[chatIndex];
+            PlayChatSound(chatIndex); // 사운드도 같이 재생
+        }
+    }
+
+    void PlayChatSound(int index)
+    {
+        if (chatAudioSource == null || chatAudioClips == null || index >= chatAudioClips.Length) return;
+
+        if (chatAudioSource.isPlaying)
+            chatAudioSource.Stop();
+
+        chatAudioSource.clip = chatAudioClips[index];
+        chatAudioSource.Play();
+    }
+
+    void StopChatSound()
+    {
+        if (chatAudioSource != null && chatAudioSource.isPlaying)
+            chatAudioSource.Stop();
     }
 
     public void Interact()
@@ -125,10 +158,10 @@ public class ChangeYellow : MonoBehaviour, IInteractable
         // 근처 UI가 아직 열려 있으면 닫기
         if (nearbyPanel != null && nearbyPanel.activeSelf)
         {
-            audioSource.Stop(); // UI 닫을 때 사운드 중단
             nearbyPanel.SetActive(false);
             isNearby = false;
             isShowingMessages = false;
+            StopNearbySound();
         }
 
         if (subtitleText != null && !subtitleText.enabled)
@@ -143,27 +176,18 @@ public class ChangeYellow : MonoBehaviour, IInteractable
             subtitleText.text = $"공기압 : {progress}%";
         }
 
-        // 채팅 조건 달성 시
         if (progress == 80 && !hasTriggeredChat)
         {
             if (objectToHide != null)
                 objectToHide.SetActive(false);
 
-            // 메시지별 사운드 재생 (첫 메시지 기준)
-            if (messagesToSendSounds != null && messagesToSendSounds.Length > 0 && messagesToSendSounds[0] != null)
+            if (!TireScene_ChatManager.IsChatting)
             {
-                audioSource.Stop(); // 이전 사운드 중단
-                audioSource.PlayOneShot(messagesToSendSounds[0]);
-            }
-
-            if (!JYJ_ChatManager.IsChatting)
-            {
-                JYJ_ChatManager chatManager = FindObjectOfType<JYJ_ChatManager>();
+                TireScene_ChatManager chatManager = FindObjectOfType<TireScene_ChatManager>();
                 if (chatManager != null && messagesToSend.Length > 0)
                 {
-                    // ChatManager에서 메시지별 사운드도 처리하도록 설계되어 있다면,
-                    // chatManager.StartChat(messagesToSend, messagesToSendSounds); 처럼 넘겨도 됨
-                    chatManager.StartChat(messagesToSend);
+                    chatManager.StartChat(messagesToSend, chatAudioClips); // 자신의 사운드 클립 전달
+                                                                           // this를 넘겨서 ShowNextChatMessage 호출 가능
                     hasTriggeredChat = true;
                 }
             }

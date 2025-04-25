@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MenuManager : MonoBehaviour
+public class TireScene_MenuManager : MonoBehaviour
 {
-    public  MenuManager Instance { get; private set; }
+    public TireScene_MenuManager Instance { get; private set; }
     public GameObject pauseMenuUI;
     public bool GameIsPaused { get; private set; } = false;
 

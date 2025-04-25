@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class LeftClickDisappear : MonoBehaviour, RaycastInteractor.IInteractable
+public class JYJ_LeftClickDisappear : MonoBehaviour, JYJ_RaycastInteractor.IInteractable
 {
     [Header("비활성화 시 활성화할 오브젝트")]
     public GameObject targetObject; // 활성화할 오브젝트

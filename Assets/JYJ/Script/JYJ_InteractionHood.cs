@@ -1,8 +1,8 @@
 using UnityEngine;
 using System.Collections;
-using static RaycastInteractor;
+using static JYJ_RaycastInteractor;
 
-public class InteractionHood : MonoBehaviour, IInteractable
+public class JYJ_InteractionHood : MonoBehaviour, IInteractable
 {
     [Header("후드 설정")]
     public Animator hoodAnimator;

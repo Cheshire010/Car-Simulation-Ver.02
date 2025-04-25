@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-public class Player_Move : MonoBehaviour
+public class JYJ_Player_Move : MonoBehaviour
 {
     public float moveSpeed = 5f;
     public float mouseSensitivity = 1500f;
@@ -15,10 +15,10 @@ public class Player_Move : MonoBehaviour
 
     private bool canLook = false;
     private float lookDelay = 1f;
-    MenuManager MenuManager;
+    JYJ_MenuManager MenuManager;
     void Awake()
     {
-        MenuManager = GameObject.Find("MenuManager").GetComponent<MenuManager>();
+        MenuManager = GameObject.Find("MenuManager").GetComponent<JYJ_MenuManager>();
         rb = GetComponent<Rigidbody>();
         if (rb == null)
         {
@@ -66,7 +66,7 @@ public class Player_Move : MonoBehaviour
 
     void Update()
     {
-        if (MenuManager.GameIsPaused || ChatManager.IsChatting)
+        if (MenuManager.GameIsPaused || JYJ_ChatManager.IsChatting)
         {
             return;
         }
@@ -101,7 +101,7 @@ public class Player_Move : MonoBehaviour
                 Camera.main.transform.localRotation = Quaternion.Euler(0, 0, 0);
         }
 
-        if (!MenuManager.GameIsPaused && !ChatManager.IsChatting && Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (!MenuManager.GameIsPaused && !JYJ_ChatManager.IsChatting && Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             isGrounded = false;
@@ -113,6 +113,7 @@ public class Player_Move : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
+
         }
     }
 
@@ -121,6 +122,7 @@ public class Player_Move : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = false;
+
         }
     }
 
