@@ -66,9 +66,8 @@ public class Player_Move : MonoBehaviour
 
     void Update()
     {
-        if (MenuManager.GameIsPaused)
+        if (MenuManager.GameIsPaused || ChatManager.IsChatting)
         {
-            // 게임이 일시 정지되었을 때, 플레이어의 이동과 마우스 회전 비활성화
             return;
         }
 
@@ -102,7 +101,7 @@ public class Player_Move : MonoBehaviour
                 Camera.main.transform.localRotation = Quaternion.Euler(0, 0, 0);
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (!MenuManager.GameIsPaused && !ChatManager.IsChatting && Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             isGrounded = false;
