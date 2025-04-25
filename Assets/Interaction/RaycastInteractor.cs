@@ -35,54 +35,43 @@ public class RaycastInteractor : MonoBehaviour
 
     void HandleRaycastInteraction()
     {
-        RaycastHit[] hits = Physics.RaycastAll(
+        RaycastHit hit;
+        bool detected = Physics.Raycast(
             Camera.main.transform.position,
             Camera.main.transform.forward,
+            out hit,
             detectDistance
         );
 
-        bool detected = false;
-        foreach (RaycastHit hit in hits)
+        if (detected && hit.collider.CompareTag(targetTag))
         {
-            if (hit.collider.CompareTag(targetTag))
+            Renderer rend = hit.collider.GetComponent<Renderer>();
+            if (rend != null)
             {
-                // 가장 가까운 오브젝트만 처리
-                detected = true;
-                ProcessHit(hit);
-                break; // 첫 번째로 발견된 대상에서 멈춤
+                if (rend != lastRenderer)
+                {
+                    RemoveHighlight();
+                    lastRenderer = rend;
+                    originalColor = rend.material.color;
+                    rend.material.color = highlightColor;
+                }
+
+                // 좌클릭 시 상호작용
+                if (Input.GetMouseButtonDown(0))
+                {
+                    IInteractable interactable = hit.collider.GetComponent<IInteractable>();
+                    if (interactable != null)
+                    {
+                        interactable.Interact();
+                    }
+                }
             }
         }
-
-        if (!detected)
+        else
         {
             RemoveHighlight();
         }
     }
-
-    void ProcessHit(RaycastHit hit)
-    {
-        Renderer rend = hit.collider.GetComponent<Renderer>();
-        if (rend != null)
-        {
-            if (rend != lastRenderer)
-            {
-                RemoveHighlight();
-                lastRenderer = rend;
-                originalColor = rend.material.color;
-                rend.material.color = highlightColor;
-            }
-
-            if (Input.GetMouseButtonDown(0))
-            {
-                IInteractable interactable = hit.collider.GetComponent<IInteractable>();
-                if (interactable != null)
-                {
-                    interactable.Interact();
-                }
-            }
-        }
-    }
-
 
 
     void RemoveHighlight()
