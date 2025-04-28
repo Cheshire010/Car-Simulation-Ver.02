@@ -162,10 +162,10 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 30
+    m_FontSize: 20
     m_FontStyle: 1
     m_BestFit: 0
-    m_MinSize: 3
+    m_MinSize: 2
     m_MaxSize: 40
     m_Alignment: 4
     m_AlignByGeometry: 0
@@ -199,7 +199,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 400, y: 200}
+  m_SizeDelta: {x: 250, y: 200}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!1 &28927073
 GameObject:
@@ -12076,7 +12076,7 @@ GameObject:
   - component: {fileID: 1923525522339341884}
   - component: {fileID: 1908582240415957307}
   - component: {fileID: 6184260451869064579}
-  - component: {fileID: 8897451619330075946}
+  - component: {fileID: 8897451619330075948}
   - component: {fileID: 8897451619330075947}
   m_Layer: 0
   m_Name: Player
@@ -12173,10 +12173,10 @@ MonoBehaviour:
     \uC704\uD574\uC11C\uB294"
   - "\uC6CC\uC154\uC561\uC744 \uC8FC\uAE30\uC801\uC73C\uB85C \uCC44\uC6CC\uC8FC\uB294\uAC83\uC774
     \uC88B\uC2B5\uB2C8\uB2E4"
-  - "\uC6CC\uC154\uC561\uC740 \uC778\uD654\uC131\uC774 \uAC15\uD558\uB2C8 \uD654\uC5FC\uACFC
-    \uBD88\uAF43\uC744 \uBA40\uB9AC\uD558\uB294\uAC83\uC774 \uC88B\uC2B5\uB2C8\uB2E4"
+  - "\uC6CC\uC154\uC561\uC740 \uC778\uD654\uC131\uC774 \uAC15\uD558\uB2C8 \uBD88\uAF43
+    \uADFC\uCC98\uC5D0\uC11C \uB2E4\uB8E8\uC9C0\uB9C8\uC138\uC694"
   - "\uB610\uD55C \uC720\uB3C5\uC131\uC774 \uC788\uC73C\uB2C8 \uC808\uB300 \uB9C8\uC2DC\uC9C0
-    \uC54A\uB3C4\uB85D \uC8FC\uC758\uD558\uC2DC\uB294\uAC83\uC774 \uC88B\uC2B5\uB2C8\uB2E4"
+    \uC54A\uB3C4\uB85D \uD574\uC8FC\uC138\uC694"
   soundClips:
   - {fileID: 8300000, guid: 2a1cc8ef62927c04aab44abc8fbf87aa, type: 3}
   - {fileID: 8300000, guid: 69ddb3160a6abad4aa3d1f585fcbbe7e, type: 3}
@@ -15003,21 +15003,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5505892858047526484}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &8897451619330075946
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5505892858047526484}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54601447517e4664d938d374979bf68e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 5
-  mouseSensitivity: 1500
-  jumpForce: 5
 --- !u!114 &8897451619330075947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15033,6 +15018,24 @@ MonoBehaviour:
   targetTag: Interactable
   detectDistance: 2
   highlightColor: {r: 1, g: 0, b: 0, a: 1}
+--- !u!114 &8897451619330075948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5505892858047526484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18a7b2633e3f96447b85c2d393037f05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 5
+  mouseSensitivity: 1500
+  jumpForce: 0
+  playerCamera: {fileID: 233938616}
+  zoomFOV: 30
+  zoomSpeed: 5
 --- !u!114 &8911840538332704314
 MonoBehaviour:
   m_ObjectHideFlags: 0
