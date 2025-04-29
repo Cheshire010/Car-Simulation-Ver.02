@@ -64,7 +64,7 @@ public class JYJ_Player_Move : MonoBehaviour
         canLook = true;
     }
 
-    void Update()
+    public void Update()
     {
         if (MenuManager.GameIsPaused || JYJ_ChatManager.IsChatting)
         {

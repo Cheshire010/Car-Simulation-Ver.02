@@ -7,22 +7,11 @@ public class JYJ_RaycastInteractor : MonoBehaviour
     [Header("상호작용 설정")]
     public string targetTag = "Interactable"; // 감지할 태그 이름
     public float detectDistance = 2f;         // 감지 거리(미터)
-    public Color highlightColor = Color.red;  // 하이라이트 색상
+    public Color highlightColor = Color.red;  // 하이라이트 색상 (빨강)
 
     private Renderer lastRenderer;            // 마지막으로 하이라이트된 오브젝트의 Renderer
-    private Color originalColor;              // 원래 색상 저장
-    //void Awake()
-    //{
-    //    if (Instance == null)
-    //    {
-    //        Instance = this;
-    //        DontDestroyOnLoad(gameObject);
-    //    }
-    //    else
-    //    {
-    //        Destroy(gameObject);
-    //    }
-    //}
+    private Color[] originalColors;           // 모든 머티리얼의 원래 색상 저장
+
     void Update()
     {
         HandleRaycastInteraction();
@@ -46,7 +35,6 @@ public class JYJ_RaycastInteractor : MonoBehaviour
         {
             if (hit.collider.CompareTag(targetTag))
             {
-                // 가장 가까운 오브젝트만 처리
                 detected = true;
                 ProcessHit(hit);
                 break; // 첫 번째로 발견된 대상에서 멈춤
@@ -68,8 +56,13 @@ public class JYJ_RaycastInteractor : MonoBehaviour
             {
                 RemoveHighlight();
                 lastRenderer = rend;
-                originalColor = rend.material.color;
-                rend.material.color = highlightColor;
+                // 모든 머티리얼의 원래 색상 저장 및 빨강으로 변경
+                originalColors = new Color[rend.materials.Length];
+                for (int i = 0; i < rend.materials.Length; i++)
+                {
+                    originalColors[i] = rend.materials[i].color;
+                    rend.materials[i].color = highlightColor;
+                }
             }
 
             if (Input.GetMouseButtonDown(0))
@@ -83,14 +76,17 @@ public class JYJ_RaycastInteractor : MonoBehaviour
         }
     }
 
-
-
     void RemoveHighlight()
     {
-        if (lastRenderer != null)
+        if (lastRenderer != null && originalColors != null)
         {
-            lastRenderer.material.color = originalColor;
+            for (int i = 0; i < lastRenderer.materials.Length; i++)
+            {
+                if (i < originalColors.Length)
+                    lastRenderer.materials[i].color = originalColors[i];
+            }
             lastRenderer = null;
+            originalColors = null;
         }
     }
 

@@ -66,9 +66,8 @@ public class TireScene_PlayerMove : MonoBehaviour
 
     void Update()
     {
-        if (MenuManager.GameIsPaused)
+        if (MenuManager.GameIsPaused || TireScene_ChatManager.IsChatting)//  텍스트 출력 중이면 조작 막기
         {
-            // 게임이 일시 정지되었을 때, 플레이어의 이동과 마우스 회전 비활성화
             return;
         }
 

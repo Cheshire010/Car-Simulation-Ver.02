@@ -1,196 +1,225 @@
 using UnityEngine;
 using UnityEngine.UI;
-using static TireScene_RayCast;
 
-public class AirGun_Interaction : MonoBehaviour, IInteractable
+public class AirGun_Interaction : MonoBehaviour
 {
-    public Text chatText;
-    public Text subtitleText;  // 진행도 텍스트
-    private int progress = 30;
-    public GameObject objectToHide;
+    [Header("Detection Settings")]
+    [SerializeField] private float detectRange = 1.5f;
+    [SerializeField] private string playerTag = "Player";
 
-    [Header("대화 메시지")]
-    public string[] messagesToSend;
-    private bool hasTriggeredChat = false;
+    [Header("UI Settings")]
+    [SerializeField] private GameObject messagePanel; // 안내 패널
+    [SerializeField] private Text messageText;        // 안내 텍스트
+    [SerializeField] private Text percentText;        // 퍼센트 텍스트
+    [SerializeField] private float messageInterval = 2f;
 
-    [Header("근처 접근 시 표시할 UI")]
-    public GameObject nearbyPanel;
-    public Text nearbyText;
-    public string[] nearbyMessages;
+    [Header("Audio Settings")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip[] messageSounds;      // 안내 사운드
+    [SerializeField] private AudioClip[] completeSounds;     // 완료 후 사운드(2개)
+
+    [Header("Messages")]
+    [SerializeField] private string[] messages;              // 안내 메시지
+    [SerializeField] private string[] completeMessages;      // 완료 후 메시지(2개)
+
     private int currentIndex = 0;
-    private bool isNearby = false;
-    private bool hasActivatedNearby = false;
-
-    [Header("설정")]
-    public float detectRange = 5f;
-
-    [Header("메시지 자동 넘김 설정")]
-    public float messageInterval = 2f;  // 메시지 간 간격 (초)
+    private bool isPlayerInRange = false;
     private float messageTimer = 0f;
-    private bool isShowingMessages = false;
+    private bool isMessaging = false;
 
-    [Header("근처 접근 메시지 사운드")]
-    public AudioSource nearbyAudioSource;
-    public AudioClip[] nearbyAudioClips;
+    // 진행도
+    private int percent = 30;
+    private bool isCompleted = false;
+    private int completeIndex = 0;
+    private bool isCompleteMessaging = false;
+    private bool hasCompleted = false; // 완료 메시지 최초 1회만
+    private bool hasInitialMessagePlayed = false; // 초기 메시지 최초 1회만
 
-    [Header("대화 메시지 사운드")]
-    public AudioSource chatAudioSource;
-    public AudioClip[] chatAudioClips;
-
-    void Start()
-    {
-        if (subtitleText != null) subtitleText.enabled = false;
-        if (nearbyPanel != null) nearbyPanel.SetActive(false);
-    }
+    [Header("종료 후 활성화 오브젝트")]
+    public GameObject activateOnComplete;
 
     void Update()
     {
-        CheckPlayerNearby();
+        CheckPlayerProximity();
 
-        // 자동 메시지 넘기기
-        if (isShowingMessages)
+        // 근접 안내 메시지 자동 넘김
+        if (isMessaging)
         {
             messageTimer += Time.deltaTime;
+
             if (messageTimer >= messageInterval)
             {
                 messageTimer = 0f;
-                ShowNextNearbyMessage();
+                ShowNextMessage();
             }
-        }
 
-        if (isNearby && Input.GetKeyDown(KeyCode.Space))
-        {
-            isNearby = false;
-            if (nearbyPanel != null) nearbyPanel.SetActive(false);
-            isShowingMessages = false;
-            StopNearbySound();
-        }
-    }
-
-    void CheckPlayerNearby()
-    {
-        if (hasActivatedNearby) return;
-
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player == null) return;
-
-        float distance = Vector3.Distance(player.transform.position, transform.position);
-
-        if (distance < detectRange)
-        {
-            isNearby = true;
-            hasActivatedNearby = true;
-            currentIndex = 0;
-
-            if (nearbyPanel != null) nearbyPanel.SetActive(true);
-            isShowingMessages = true;
-            messageTimer = 0f;
-            ShowNextNearbyMessage();
-        }
-    }
-
-    void ShowNextNearbyMessage()
-    {
-        if (nearbyMessages == null || nearbyMessages.Length == 0 || nearbyText == null) return;
-
-        if (currentIndex < nearbyMessages.Length)
-        {
-            nearbyText.text = nearbyMessages[currentIndex];
-            PlayNearbySound(currentIndex); // 근처 접근 사운드
-            currentIndex++;
-        }
-        else
-        {
-            // 마지막 메시지까지 보여준 후 자동 닫기
-            isNearby = false;
-            isShowingMessages = false;
-            if (nearbyPanel != null) nearbyPanel.SetActive(false);
-            StopNearbySound();
-        }
-    }
-
-    void PlayNearbySound(int index)
-    {
-        if (nearbyAudioSource == null || nearbyAudioClips == null || index >= nearbyAudioClips.Length) return;
-
-        if (nearbyAudioSource.isPlaying)
-            nearbyAudioSource.Stop();
-
-        nearbyAudioSource.clip = nearbyAudioClips[index];
-        nearbyAudioSource.Play();
-    }
-
-    void StopNearbySound()
-    {
-        if (nearbyAudioSource != null && nearbyAudioSource.isPlaying)
-            nearbyAudioSource.Stop();
-    }
-
-    // 대화 메시지 재생 (TireScene_ChatManager에서 호출해야 함)
-    public void ShowNextChatMessage(int chatIndex)
-    {
-        if (messagesToSend != null && chatIndex < messagesToSend.Length)
-        {
-            chatText.text = messagesToSend[chatIndex];
-            PlayChatSound(chatIndex); // 사운드도 같이 재생
-        }
-    }
-
-    void PlayChatSound(int index)
-    {
-        if (chatAudioSource == null || chatAudioClips == null || index >= chatAudioClips.Length) return;
-
-        if (chatAudioSource.isPlaying)
-            chatAudioSource.Stop();
-
-        chatAudioSource.clip = chatAudioClips[index];
-        chatAudioSource.Play();
-    }
-
-    void StopChatSound()
-    {
-        if (chatAudioSource != null && chatAudioSource.isPlaying)
-            chatAudioSource.Stop();
-    }
-
-    public void Interact()
-    {
-        // 근처 UI가 아직 열려 있으면 닫기
-        if (nearbyPanel != null && nearbyPanel.activeSelf)
-        {
-            nearbyPanel.SetActive(false);
-            isNearby = false;
-            isShowingMessages = false;
-            StopNearbySound();
-        }
-
-        if (subtitleText != null && !subtitleText.enabled)
-        {
-            subtitleText.enabled = true;
-        }
-
-        progress = Mathf.Min(progress + 10, 80);
-
-        if (subtitleText != null)
-        {
-            subtitleText.text = $"공기압 : {progress}%";
-        }
-
-        if (progress == 80 && !hasTriggeredChat)
-        {
-            if (objectToHide != null)
-                objectToHide.SetActive(false);
-
-            if (!TireScene_ChatManager.IsChatting)
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                TireScene_ChatManager chatManager = FindObjectOfType<TireScene_ChatManager>();
-                if (chatManager != null && messagesToSend.Length > 0)
-                {
-                    chatManager.StartChat(messagesToSend, chatAudioClips); // 자신의 사운드 클립 전달
-                                                                           // this를 넘겨서 ShowNextChatMessage 호출 가능
-                    hasTriggeredChat = true;
-                }
+                ForceStopMessages();
             }
         }
+
+        // 완료 후 메시지/사운드: 스페이스바로 수동 넘김
+        if (isCompleteMessaging && Input.GetKeyDown(KeyCode.Space))
+        {
+            ShowNextCompleteMessage();
+        }
+
+        // 클릭으로 퍼센트 진행
+        if (isPlayerInRange && !isCompleted && Input.GetMouseButtonDown(0))
+        {
+            TryIncreasePercent();
+        }
+    }
+
+    void CheckPlayerProximity()
+    {
+        Collider[] colliders = Physics.OverlapSphere(transform.position, detectRange);
+        bool wasInRange = isPlayerInRange;
+        isPlayerInRange = false;
+
+        foreach (Collider col in colliders)
+        {
+            if (col.CompareTag(playerTag) && !col.isTrigger)
+            {
+                isPlayerInRange = true;
+                break;
+            }
+        }
+
+        // 상태 변경 처리
+        if (isPlayerInRange && !wasInRange) StartMessages();
+        if (!isPlayerInRange && wasInRange)
+        {
+            ForceStopMessages();
+            ForceStopCompleteMessages();
+        }
+    }
+
+    void StartMessages()
+    {
+        if (messages.Length == 0 || hasInitialMessagePlayed) return;
+        hasInitialMessagePlayed = true;
+
+        currentIndex = 0;
+        messageTimer = 0f;
+        isMessaging = true;
+        if (messagePanel != null) messagePanel.SetActive(true);
+        if (messageText != null) messageText.gameObject.SetActive(true);
+        ShowNextMessage();
+        UpdatePercentText();
+    }
+
+    void ShowNextMessage()
+    {
+        if (currentIndex >= messages.Length)
+        {
+            ForceStopMessages();
+            return;
+        }
+
+        if (messageText != null)
+        {
+            messageText.text = messages[currentIndex];
+            messageText.gameObject.SetActive(true);
+        }
+
+        if (currentIndex < messageSounds.Length && messageSounds[currentIndex] != null)
+        {
+            audioSource.Stop();
+            audioSource.PlayOneShot(messageSounds[currentIndex]);
+        }
+
+        currentIndex++;
+    }
+
+    void ForceStopMessages()
+    {
+        isMessaging = false;
+        if (messagePanel != null) messagePanel.SetActive(false);
+        if (messageText != null) messageText.gameObject.SetActive(false);
+        audioSource.Stop();
+        currentIndex = 0;
+        messageTimer = 0f;
+    }
+
+    void TryIncreasePercent()
+    {
+        if (percent >= 80) return;
+        percent += 10;
+        if (percent > 80) percent = 80;
+        UpdatePercentText();
+
+        if (percent == 80)
+        {
+            isCompleted = true;
+            ForceStopMessages();
+            StartCompleteMessages();
+        }
+    }
+
+    void UpdatePercentText()
+    {
+        if (percentText != null)
+        {
+            percentText.text = $"공기압 : {percent}%";
+            percentText.gameObject.SetActive(true);
+        }
+    }
+
+    // 완료 후 메시지/사운드 순차 출력 (최초 1회만)
+    void StartCompleteMessages()
+    {
+        if (completeMessages.Length == 0 || hasCompleted) return;
+        hasCompleted = true;
+
+        completeIndex = 0;
+        isCompleteMessaging = true;
+        if (messagePanel != null) messagePanel.SetActive(true);
+        if (messageText != null) messageText.gameObject.SetActive(true);
+        ShowNextCompleteMessage();
+    }
+
+    void ShowNextCompleteMessage()
+    {
+        if (completeIndex >= completeMessages.Length)
+        {
+            ForceStopCompleteMessages();
+            return;
+        }
+
+        if (messageText != null)
+        {
+            messageText.text = completeMessages[completeIndex];
+            messageText.gameObject.SetActive(true);
+        }
+
+        if (completeIndex < completeSounds.Length && completeSounds[completeIndex] != null)
+        {
+            audioSource.Stop();
+            audioSource.PlayOneShot(completeSounds[completeIndex]);
+        }
+
+        completeIndex++;
+    }
+
+    void ForceStopCompleteMessages()
+    {
+        isCompleteMessaging = false;
+        if (messagePanel != null) messagePanel.SetActive(false);
+        if (messageText != null) messageText.gameObject.SetActive(false);
+        audioSource.Stop();
+        completeIndex = 0;
+
+        // 마지막 대화 후 오브젝트 활성화
+        if (activateOnComplete != null)
+            activateOnComplete.SetActive(true);
+    }
+
+    // 에디터에서 감지 범위 시각화
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = new Color(1, 0.5f, 0, 0.3f);
+        Gizmos.DrawSphere(transform.position, detectRange);
     }
 }

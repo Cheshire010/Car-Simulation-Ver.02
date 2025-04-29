@@ -38,12 +38,9 @@ public class TireScene_ChatManager : MonoBehaviour
         }
     }
 
-    public void StartChat(string[] messages, AudioClip[] customSounds = null)
+    public void StartChat(string[] messages)
     {
-        // 커스텀 사운드가 있으면 사용, 없으면 기존 soundClips 사용
-        AudioClip[] targetSounds = customSounds != null ? customSounds : soundClips;
-
-        if (messages.Length != targetSounds.Length)
+        if (messages.Length != soundClips.Length)
         {
             Debug.LogWarning("메시지와 사운드 클립 개수 불일치!");
         }
@@ -56,9 +53,6 @@ public class TireScene_ChatManager : MonoBehaviour
             chatQueue.Enqueue(msg);
         }
 
-        // 사운드 소스 변경 (옵션)
-        // audioSource = customAudioSource; // 필요시 추가
-
         chatPanel.SetActive(true);
         pressText.gameObject.SetActive(true);
         isChatting = true;
@@ -67,7 +61,6 @@ public class TireScene_ChatManager : MonoBehaviour
 
         if (JYJ_RaycastInteractor.Instance != null)
             JYJ_RaycastInteractor.Instance.enabled = false;
-
     }
 
     void Update()

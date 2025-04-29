@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using static JYJ_RaycastInteractor;
 using System.Collections;
 
@@ -11,16 +12,20 @@ public class JYJ_InteractWash : MonoBehaviour, IInteractable
     [Header("파티클 설정")]
     public ParticleSystem particleEffect;
 
-    [Header("채팅 설정")]
-    public JYJ_ChatManager chatManager;
+    [Header("UI 설정")]
+    public GameObject chatPanel;
+    public Text messageText;
     public string[] completionMessage = { "테이블에 문제가 생성되었습니다. 문제를 풀어주십시오." };
 
     [Header("활성화 오브젝트")]
     public GameObject tableObject;
 
-    [Header("사운드 설정")] // 추가된 부분
+    [Header("사운드 설정")]
     public AudioSource audioSource;
     public AudioClip[] soundClips;
+
+    private Coroutine messageCoroutine;
+    private bool isMessageActive = false;
 
     public void Interact()
     {
@@ -44,29 +49,96 @@ public class JYJ_InteractWash : MonoBehaviour, IInteractable
             particleEffect.gameObject.SetActive(false);
         }
 
-        if (chatManager != null)
+        if (messageCoroutine != null) StopCoroutine(messageCoroutine);
+        messageCoroutine = StartCoroutine(ShowMessages());
+
+        // 기존 활성화 코드 제거
+        // if (tableObject != null) tableObject.SetActive(true);
+        // gameObject.SetActive(false);
+    }
+
+    IEnumerator ShowMessages()
+    {
+        Debug.Log("ShowMessages 시작");
+        SetActiveRecursively(chatPanel, true);
+        if (messageText != null)
         {
-            // 수정된 부분: this 매개변수 추가
-            chatManager.StartChat(completionMessage);
+            messageText.gameObject.SetActive(true);
+            messageText.enabled = true;
         }
 
-        if (tableObject != null) tableObject.SetActive(true);
-        gameObject.SetActive(false);
+        isMessageActive = true;
+
+        foreach (string msg in completionMessage)
+        {
+            messageText.text = msg;
+            PlayChatSound(System.Array.IndexOf(completionMessage, msg));
+
+            float timer = 0;
+            bool skip = false;
+            while (timer < 3f)
+            {
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    Debug.Log("스페이스 입력 감지");
+                    skip = true;
+                    break;
+                }
+                timer += Time.deltaTime;
+                yield return null;
+            }
+            if (skip) break;
+        }
+
+        EndMessage();
     }
 
-    // 추가된 메서드들
+    void EndMessage()
+    {
+        if (!isMessageActive)
+        {
+            Debug.Log("EndMessage: 이미 비활성화 상태");
+            return;
+        }
+        isMessageActive = false;
+
+        Debug.Log("패널 및 텍스트 비활성화");
+        SetActiveRecursively(chatPanel, false);
+        if (messageText != null)
+        {
+            messageText.text = "";
+            messageText.enabled = false;
+            messageText.gameObject.SetActive(false);
+        }
+
+        // 채팅 종료 후 오브젝트 활성화/비활성화
+        if (tableObject != null) tableObject.SetActive(true);
+        gameObject.SetActive(false); // 현재 오브젝트 비활성화
+
+        if (messageCoroutine != null)
+        {
+            StopCoroutine(messageCoroutine);
+            messageCoroutine = null;
+        }
+    }
+
+    // 모든 자식 오브젝트 활성화/비활성화 함수
+    void SetActiveRecursively(GameObject obj, bool active)
+    {
+        if (obj == null) return;
+        obj.SetActive(active);
+        foreach (Transform child in obj.transform)
+        {
+            SetActiveRecursively(child.gameObject, active);
+        }
+    }
+
     public void PlayChatSound(int index)
     {
-        if (audioSource.isPlaying)
-            audioSource.Stop();
+        if (audioSource == null || soundClips == null) return;
+        if (index < 0 || index >= soundClips.Length) return;
 
-        if (index < soundClips.Length)
-            audioSource.PlayOneShot(soundClips[index]);
-    }
-
-    public void StopAllSounds()
-    {
-        if (audioSource.isPlaying)
-            audioSource.Stop();
+        audioSource.Stop();
+        audioSource.PlayOneShot(soundClips[index]);
     }
 }
