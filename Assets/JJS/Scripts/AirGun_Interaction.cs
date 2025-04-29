@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class AirGun_Interaction : MonoBehaviour
 {
     [Header("Detection Settings")]
-    [SerializeField] private float detectRange = 5f;
+    [SerializeField] private float detectRange = 1.5f;
     [SerializeField] private string playerTag = "Player";
 
     [Header("UI Settings")]
@@ -34,6 +34,9 @@ public class AirGun_Interaction : MonoBehaviour
     private bool isCompleteMessaging = false;
     private bool hasCompleted = false; // 완료 메시지 최초 1회만
     private bool hasInitialMessagePlayed = false; // 초기 메시지 최초 1회만
+
+    [Header("종료 후 활성화 오브젝트")]
+    public GameObject activateOnComplete;
 
     void Update()
     {
@@ -207,6 +210,10 @@ public class AirGun_Interaction : MonoBehaviour
         if (messageText != null) messageText.gameObject.SetActive(false);
         audioSource.Stop();
         completeIndex = 0;
+
+        // 마지막 대화 후 오브젝트 활성화
+        if (activateOnComplete != null)
+            activateOnComplete.SetActive(true);
     }
 
     // 에디터에서 감지 범위 시각화

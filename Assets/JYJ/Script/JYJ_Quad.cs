@@ -3,8 +3,6 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-// using static RaycastInteractor; → 이 줄 삭제
-
 public class JYJ_Quad : MonoBehaviour, JYJ_RaycastInteractor.IInteractable
 {
     [System.Serializable]
@@ -20,6 +18,7 @@ public class JYJ_Quad : MonoBehaviour, JYJ_RaycastInteractor.IInteractable
     public Text questionText;
     public Button[] answerButtons;
     public Text resultText;
+    public Button closeButton; // 종료 버튼 추가
 
     [Header("문제 데이터")]
     public List<QuizQuestion> questionPool = new List<QuizQuestion>();
@@ -37,6 +36,7 @@ public class JYJ_Quad : MonoBehaviour, JYJ_RaycastInteractor.IInteractable
     {
         quizPanel.SetActive(false);
         resultText.gameObject.SetActive(false);
+        closeButton.gameObject.SetActive(false); // 종료 버튼 비활성화
 
         if (playerController == null)
         {
@@ -57,9 +57,12 @@ public class JYJ_Quad : MonoBehaviour, JYJ_RaycastInteractor.IInteractable
             int index = i;
             answerButtons[i].onClick.AddListener(() => CheckAnswer(index));
         }
+
+        // 종료 버튼 리스너 등록
+        closeButton.onClick.AddListener(CloseQuiz);
     }
 
-    public void Interact() // IInteractable 구현
+    public void Interact()
     {
         if (!isQuizActive)
         {
@@ -79,10 +82,19 @@ public class JYJ_Quad : MonoBehaviour, JYJ_RaycastInteractor.IInteractable
 
         quizPanel.SetActive(true);
         resultText.gameObject.SetActive(false);
+        closeButton.gameObject.SetActive(false); // 시작 시 종료 버튼 숨김
         SetPlayerControl(false);
+
+        // 정답 버튼 모두 다시 활성화
+        foreach (var btn in answerButtons)
+        {
+            btn.interactable = true;
+            // btn.gameObject.SetActive(true); // 버튼을 아예 숨겼었다면 주석 해제
+        }
 
         ShowNextQuestion();
     }
+
 
     List<QuizQuestion> GetRandomQuestions(int count)
     {
@@ -112,6 +124,10 @@ public class JYJ_Quad : MonoBehaviour, JYJ_RaycastInteractor.IInteractable
             return;
         }
 
+        // 문제 풀이 중에는 항상 종료 버튼 숨김
+        if (closeButton != null)
+            closeButton.gameObject.SetActive(false);
+
         QuizQuestion currentQuestion = selectedQuestions[currentQuestionIndex];
         questionText.text = currentQuestion.question;
 
@@ -123,7 +139,8 @@ public class JYJ_Quad : MonoBehaviour, JYJ_RaycastInteractor.IInteractable
         currentQuestionIndex++;
     }
 
-    void CheckAnswer(int selectedIndex) // 오류 수정 확인
+
+    void CheckAnswer(int selectedIndex)
     {
         QuizQuestion currentQuestion = selectedQuestions[currentQuestionIndex - 1];
 
@@ -144,18 +161,30 @@ public class JYJ_Quad : MonoBehaviour, JYJ_RaycastInteractor.IInteractable
     {
         resultText.text = $"점수: {score}/{selectedQuestions.Count}";
         resultText.gameObject.SetActive(true);
-        StartCoroutine(CloseQuizAfterDelay(3f));
+
+        if (closeButton != null)
+        {
+            closeButton.gameObject.SetActive(true);
+            closeButton.interactable = true;
+        }
+
+        // 정답 버튼 모두 비활성화
+        foreach (var btn in answerButtons)
+        {
+            btn.interactable = false;
+            // btn.gameObject.SetActive(false); // 버튼을 아예 숨기고 싶다면 주석 해제
+        }
     }
 
-    IEnumerator CloseQuizAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
 
+    void CloseQuiz()
+    {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
         quizPanel.SetActive(false);
         resultText.gameObject.SetActive(false);
+        closeButton.gameObject.SetActive(false); // 종료 버튼 비활성화
         SetPlayerControl(true);
         isQuizActive = false;
     }
