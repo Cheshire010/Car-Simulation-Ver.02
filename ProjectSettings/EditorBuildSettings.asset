@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/JYJScene.unity
     guid: bed7faa9c66c8a04099d846bd151a68d
+  - enabled: 1
+    path: Assets/Scenes/Engine_Oil.unity
+    guid: 31e449e66f8ba4c4ba36ac9fced8aeb6
   m_configObjects: {}
