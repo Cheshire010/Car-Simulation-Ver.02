@@ -43,8 +43,8 @@ public class LiftCarButtonInteraction : MonoBehaviour
 
         if (messagePanel != null)
             messagePanel.SetActive(false);
-        if (messageText != null)
-            messageText.gameObject.SetActive(false);
+        //if (messageText != null)
+        //    messageText.gameObject.SetActive(false);
     }
 
     void Update()
@@ -59,16 +59,17 @@ public class LiftCarButtonInteraction : MonoBehaviour
         {
             if (currentChatIndex < chatMessages.Length - 1)
             {
-                // 다음 채팅으로 이동
                 currentChatIndex++;
                 ShowChatMessage(currentChatIndex);
+
+                // 타이머 재설정
+                if (currentHideCoroutine != null)
+                    StopCoroutine(currentHideCoroutine);
+                currentHideCoroutine = StartCoroutine(HideMessageAfterDelay());
             }
             else
             {
-                // 채팅 종료
                 HideMessage();
-                if (currentHideCoroutine != null)
-                    StopCoroutine(currentHideCoroutine);
             }
         }
     }
@@ -90,6 +91,8 @@ public class LiftCarButtonInteraction : MonoBehaviour
         }
     }
 
+    private bool hasInteracted = false; // 최초 인터랙션 여부 플래그 추가
+
     void OnMouseDown()
     {
         if (liftController == null || carController == null)
@@ -98,17 +101,21 @@ public class LiftCarButtonInteraction : MonoBehaviour
             return;
         }
 
-        // 사운드 재생 (버튼 클릭 시)
+        // 사운드 재생 (버튼 클릭 시 - 매번 실행)
         if (audioSource != null && soundClip != null)
         {
             audioSource.Stop();
             audioSource.PlayOneShot(soundClip);
         }
 
-        // 채팅 시작 (버튼 클릭 시 텍스트 즉시 표시)
-        StartChat();
+        // 최초 인터랙션 시에만 채팅 시작
+        if (!hasInteracted)
+        {
+            StartChat();
+            hasInteracted = true;
+        }
 
-        // 기능 실행
+        // 기능 실행 (매번 실행)
         carController.upDuration = liftController.upDuration;
         carController.downDuration = liftController.downDuration;
         liftController.ToggleLift();
@@ -120,6 +127,9 @@ public class LiftCarButtonInteraction : MonoBehaviour
         currentChatIndex = 0;
         if (chatMessages != null && chatMessages.Length > 0)
         {
+            // 첫 메시지 즉시 표시
+            messagePanel.SetActive(true);
+            messageText.gameObject.SetActive(true);
             ShowChatMessage(currentChatIndex);
         }
         else
@@ -132,16 +142,19 @@ public class LiftCarButtonInteraction : MonoBehaviour
     {
         if (index >= chatMessages.Length) return;
 
-        // 메시지 UI 활성화
+        // UI 요소 활성화
         if (messagePanel != null)
+        {
             messagePanel.SetActive(true);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(messagePanel.GetComponent<RectTransform>());
+        }
 
         if (messageText != null)
         {
             messageText.text = chatMessages[index];
             messageText.gameObject.SetActive(true);
+            Canvas.ForceUpdateCanvases(); // 강제 UI 갱신
         }
-
         // 채팅 사운드 재생
         if (audioSource != null && soundClip != null)
         {

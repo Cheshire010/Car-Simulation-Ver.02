@@ -1,7 +1,9 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
-[RequireComponent(typeof(Animator), typeof(Collider))]
+[RequireComponent(typeof(Animator), typeof(Collider), typeof(AudioSource))]
 public class EngineOilCapInteraction : MonoBehaviour
 {
     [Header("움직일 오일 객체")]
@@ -11,69 +13,155 @@ public class EngineOilCapInteraction : MonoBehaviour
     public Vector3 moveOffset = new Vector3(0f, 0f, -0.2f);
     public float moveDuration = 0.8f;
 
-    Animator _anim;
-    Collider _col;
+    [Header("Chat Settings")]
+    public GameObject chatPanel;
+    public Text chatText;
+    public string[] chatMessages;
+    public AudioClip[] soundClips;
 
-    Vector3 _origPos;
-    Quaternion _origRot;
-    bool isOpen = false;
+    [Header("파티클 효과")]
+    public ParticleSystem oilParticleEffect; // Inspector에서 할당
+
+    private Queue<string> messageQueue;
+    private Queue<AudioClip> soundQueue;
+    private AudioSource audioSource;
+    private bool isChatting = false;
+
+    // 내부 참조
+    private Animator _anim;
+    private Collider _col;
+    private Vector3 _origPos;
+    private Quaternion _origRot;
+    private bool isOpen = false;
+    private bool hasInteracted = false; // 최초 인터랙션 여부
 
     void Awake()
     {
         _anim = GetComponent<Animator>();
         _col = GetComponent<Collider>();
+        audioSource = GetComponent<AudioSource>();
         _col.isTrigger = true;
 
-        // 엔진오일의 원래 월드 위치/회전 저장
         _origPos = engineOil.position;
         _origRot = engineOil.rotation;
+    }
+
+    void Update()
+    {
+        // 스페이스 키로 다음 대화
+        if (isChatting && Input.GetKeyDown(KeyCode.Space))
+        {
+            PlayNextChat();
+        }
+
+        // 오일 객체 클릭 감지
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            // engineOil 오브젝트를 클릭했을 때만 파티클 재생
+            if (Physics.Raycast(ray, out hit) && hit.transform == engineOil)
+            {
+                PlayOilParticle();
+            }
+        }
     }
 
     void OnMouseDown()
     {
         if (isOpen)
         {
-            // 1) 캡 닫기 애니메이션 트리거
-            _anim.SetTrigger("Close_Cap");    // Animator에 등록된 이름으로 바꿔주세요
-            // 2) 오일을 원위치로 되돌린다
+            _anim.SetTrigger("Close_Cap");
             StartCoroutine(MoveOilCoroutine(false));
         }
         else
         {
-            // 1) 캡 열기 애니메이션 트리거
-            _anim.SetTrigger("Open_Cap");     // Animator에 등록된 이름으로 바꿔주세요
-            // 2) 오일을 옆으로 이동
+            _anim.SetTrigger("Open_Cap");
             StartCoroutine(MoveOilCoroutine(true));
+
+            // 최초 인터랙션 시에만 채팅 시작
+            if (!hasInteracted)
+            {
+                StartChat();
+                hasInteracted = true;
+            }
+        }
+        isOpen = !isOpen;
+    }
+
+    void StartChat()
+    {
+        if (chatMessages == null || chatMessages.Length == 0 ||
+            soundClips == null || soundClips.Length == 0)
+            return;
+
+        if (chatMessages.Length != soundClips.Length)
+        {
+            Debug.LogWarning("메시지와 사운드 개수가 다릅니다!");
+            return;
         }
 
-        isOpen = !isOpen;
+        messageQueue = new Queue<string>(chatMessages);
+        soundQueue = new Queue<AudioClip>(soundClips);
+
+        if (chatPanel != null)
+            chatPanel.SetActive(true);
+
+        isChatting = true;
+        PlayNextChat();
+    }
+
+    void PlayNextChat()
+    {
+        // 현재 사운드 즉시 중단
+        if (audioSource.isPlaying)
+            audioSource.Stop();
+
+        // 대화 종료 조건
+        if (messageQueue.Count == 0 || soundQueue.Count == 0)
+        {
+            EndChat();
+            return;
+        }
+
+        // 다음 메시지/사운드 표시 및 재생
+        string nextMsg = messageQueue.Dequeue();
+        AudioClip nextClip = soundQueue.Dequeue();
+
+        if (chatText != null)
+            chatText.text = nextMsg;
+
+        if (audioSource != null && nextClip != null)
+            audioSource.PlayOneShot(nextClip);
+
+        // UI 강제 갱신 (혹시 모를 렌더링 이슈 방지)
+        if (chatText != null)
+        {
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(chatText.rectTransform);
+        }
+    }
+
+    void EndChat()
+    {
+        if (chatPanel != null)
+            chatPanel.SetActive(false);
+        isChatting = false;
+        if (audioSource.isPlaying)
+            audioSource.Stop();
     }
 
     IEnumerator MoveOilCoroutine(bool opening)
     {
-        // (1) 뚜껑 애니메이션 타이밍 대기
         yield return new WaitForSeconds(0.5f);
 
-        // (2) 시작/종료 위치·회전 결정
         Vector3 startPos = engineOil.position;
         Quaternion startRot = engineOil.rotation;
 
-        Vector3 endPos;
-        Quaternion endRot;
-        if (opening)
-        {
-            // 뚜껑(transform) 기준으로 moveOffset 만큼 월드 좌표 계산
-            endPos = transform.TransformPoint(moveOffset);
-            endRot = transform.rotation;
-        }
-        else
-        {
-            // 원래 자리로 복귀
-            endPos = _origPos;
-            endRot = _origRot;
-        }
+        Vector3 endPos = opening ? transform.TransformPoint(moveOffset) : _origPos;
+        Quaternion endRot = opening ? transform.rotation : _origRot;
 
-        // (3) 부드럽게 보간
         float t = 0f;
         while (t < moveDuration)
         {
@@ -84,8 +172,16 @@ public class EngineOilCapInteraction : MonoBehaviour
             yield return null;
         }
 
-        // (4) 최종 고정
         engineOil.position = endPos;
         engineOil.rotation = endRot;
+    }
+
+    // 오일 파티클 재생 메서드
+    void PlayOilParticle()
+    {
+        if (oilParticleEffect != null)
+        {
+            oilParticleEffect.Play();
+        }
     }
 }

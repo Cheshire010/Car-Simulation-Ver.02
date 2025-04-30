@@ -37,7 +37,7 @@ public class FilterSwapOnCubeClick : MonoBehaviour
         var col = GetComponent<Collider>();
         col.isTrigger = true;
         if (messagePanel != null) messagePanel.SetActive(false);
-        if (messageText != null) messageText.gameObject.SetActive(false);
+       // if (messageText != null) messageText.gameObject.SetActive(false);
     }
 
     void Update()

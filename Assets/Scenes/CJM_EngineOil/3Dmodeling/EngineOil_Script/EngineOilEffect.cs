@@ -10,48 +10,58 @@ public class EngineOilEffect : MonoBehaviour
     [Header("파티클이 나올 지점 (뚜껑 스포트)")]
     public Transform spoutPoint;
 
-    // 재생 시간 (초)
+    [Header("재생 시간 (초)")]
     public float playDuration = 10f;
 
     void Awake()
     {
         var col = GetComponent<Collider>();
-        col.isTrigger = false;
+        col.isTrigger = false; // 물리 충돌 활성화
     }
 
-    void OnMouseDown()
+    void Update()
+    {
+        // 1. 좌클릭 감지
+        if (Input.GetMouseButtonDown(0))
+        {
+            // 2. 마우스 레이캐스트로 오브젝트 선택 확인
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit) && hit.collider.gameObject == this.gameObject)
+            {
+                StartParticleEffect();
+            }
+        }
+    }
+
+    void StartParticleEffect()
     {
         if (fillEffectPrefab == null || spoutPoint == null)
         {
-            Debug.LogWarning("fillEffectPrefab 또는 spoutPoint 를 할당하세요.");
+            Debug.LogWarning("fillEffectPrefab 또는 spoutPoint를 인스펙터에 할당하세요!");
             return;
         }
 
-        // 1) 파티클 인스턴스화
-        var ps = Instantiate(
+        // 3. 파티클 생성 및 재생
+        ParticleSystem ps = Instantiate(
             fillEffectPrefab,
             spoutPoint.position,
-            spoutPoint.rotation);
-
-        // 2) 재생
+            spoutPoint.rotation
+        );
         ps.Play();
 
-        // 3) 일정 시간 후 정지 & 제거
+        // 4. 자동 정지 및 제거
         StartCoroutine(StopAndDestroy(ps));
     }
 
     IEnumerator StopAndDestroy(ParticleSystem ps)
     {
-        // playDuration 만큼 대기
         yield return new WaitForSeconds(playDuration);
-
-        // 정지
         ps.Stop();
 
-        // 파티클이 완전히 사라질 때까지 잠시 대기 (옵션)
+        // 파티클 시스템이 완전히 소멸될 때까지 대기
         yield return new WaitForSeconds(ps.main.startLifetime.constantMax);
-
-        // 게임 오브젝트 제거
         Destroy(ps.gameObject);
     }
 }
