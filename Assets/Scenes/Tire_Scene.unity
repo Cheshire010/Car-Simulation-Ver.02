@@ -507,7 +507,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: -169.29138, y: -219.06982}
-  m_SizeDelta: {x: 1323.7764, y: 281.8774}
+  m_SizeDelta: {x: 1323, y: 282}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &436859661
 CanvasRenderer:
@@ -2788,7 +2788,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -229, y: -181}
-  m_SizeDelta: {x: 347.6457, y: 231.6116}
+  m_SizeDelta: {x: 347, y: 231}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!4 &182427964321461386
 Transform:
@@ -3833,7 +3833,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  mouseSensitivity: 1500
+  mouseSensitivity: 250
   jumpForce: 0
 --- !u!114 &9165898907560128056
 MonoBehaviour:
