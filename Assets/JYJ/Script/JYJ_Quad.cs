@@ -3,8 +3,6 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-// using static RaycastInteractor; → 이 줄 삭제
-
 public class JYJ_Quad : MonoBehaviour, JYJ_RaycastInteractor.IInteractable
 {
     [System.Serializable]
@@ -20,6 +18,8 @@ public class JYJ_Quad : MonoBehaviour, JYJ_RaycastInteractor.IInteractable
     public Text questionText;
     public Button[] answerButtons;
     public Text resultText;
+    public Button closeButton; // 종료 버튼 추가
+    public Text feedbackText;  // 정답/오답 피드백 텍스트 추가
 
     [Header("문제 데이터")]
     public List<QuizQuestion> questionPool = new List<QuizQuestion>();
@@ -28,15 +28,23 @@ public class JYJ_Quad : MonoBehaviour, JYJ_RaycastInteractor.IInteractable
     public JYJ_Player_Move playerController;
     public JYJ_RaycastInteractor raycastInteractor;
 
+    [Header("피드백 설정")]
+    public float feedbackDuration = 1.0f; // 피드백 표시 시간
+
     private List<QuizQuestion> selectedQuestions = new List<QuizQuestion>();
     private int currentQuestionIndex = 0;
     private int score = 0;
     private bool isQuizActive = false;
+    private Coroutine feedbackCoroutine;
 
     void Start()
     {
         quizPanel.SetActive(false);
         resultText.gameObject.SetActive(false);
+        closeButton.gameObject.SetActive(false); // 종료 버튼 비활성화
+
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(false); // 피드백 텍스트 숨김
 
         if (playerController == null)
         {
@@ -57,9 +65,12 @@ public class JYJ_Quad : MonoBehaviour, JYJ_RaycastInteractor.IInteractable
             int index = i;
             answerButtons[i].onClick.AddListener(() => CheckAnswer(index));
         }
+
+        // 종료 버튼 리스너 등록
+        closeButton.onClick.AddListener(CloseQuiz);
     }
 
-    public void Interact() // IInteractable 구현
+    public void Interact()
     {
         if (!isQuizActive)
         {
@@ -79,7 +90,17 @@ public class JYJ_Quad : MonoBehaviour, JYJ_RaycastInteractor.IInteractable
 
         quizPanel.SetActive(true);
         resultText.gameObject.SetActive(false);
+        closeButton.gameObject.SetActive(false); // 시작 시 종료 버튼 숨김
         SetPlayerControl(false);
+
+        // 정답 버튼 모두 다시 활성화
+        foreach (var btn in answerButtons)
+        {
+            btn.interactable = true;
+        }
+
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(false);
 
         ShowNextQuestion();
     }
@@ -112,31 +133,75 @@ public class JYJ_Quad : MonoBehaviour, JYJ_RaycastInteractor.IInteractable
             return;
         }
 
+        if (closeButton != null)
+            closeButton.gameObject.SetActive(false);
+
         QuizQuestion currentQuestion = selectedQuestions[currentQuestionIndex];
         questionText.text = currentQuestion.question;
 
         for (int i = 0; i < answerButtons.Length; i++)
         {
             answerButtons[i].GetComponentInChildren<Text>().text = currentQuestion.answers[i];
+            answerButtons[i].interactable = true;
         }
+
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(false);
 
         currentQuestionIndex++;
     }
 
-    void CheckAnswer(int selectedIndex) // 오류 수정 확인
+    void CheckAnswer(int selectedIndex)
     {
         QuizQuestion currentQuestion = selectedQuestions[currentQuestionIndex - 1];
 
-        if (selectedIndex == currentQuestion.correctIndex)
+        bool isCorrect = (selectedIndex == currentQuestion.correctIndex);
+        if (isCorrect)
         {
             score++;
             Debug.Log("정답!");
+            ShowFeedback("정답!", Color.green);
         }
         else
         {
             Debug.Log("오답!");
+            ShowFeedback("오답!", Color.red);
         }
 
+        // 정답 버튼 일시적으로 비활성화
+        foreach (var btn in answerButtons)
+        {
+            btn.interactable = false;
+        }
+
+        // 다음 문제로 넘어가기 전에 피드백 표시 시간만큼 대기
+        StartCoroutine(NextQuestionAfterDelay(feedbackDuration));
+    }
+
+    void ShowFeedback(string message, Color color)
+    {
+        if (feedbackText == null) return;
+
+        if (feedbackCoroutine != null)
+            StopCoroutine(feedbackCoroutine);
+
+        feedbackCoroutine = StartCoroutine(ShowFeedbackCoroutine(message, color));
+    }
+
+    IEnumerator ShowFeedbackCoroutine(string message, Color color)
+    {
+        feedbackText.text = message;
+        feedbackText.color = color;
+        feedbackText.gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(feedbackDuration);
+
+        feedbackText.gameObject.SetActive(false);
+    }
+
+    IEnumerator NextQuestionAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
         ShowNextQuestion();
     }
 
@@ -144,20 +209,35 @@ public class JYJ_Quad : MonoBehaviour, JYJ_RaycastInteractor.IInteractable
     {
         resultText.text = $"점수: {score}/{selectedQuestions.Count}";
         resultText.gameObject.SetActive(true);
-        StartCoroutine(CloseQuizAfterDelay(3f));
+
+        if (closeButton != null)
+        {
+            closeButton.gameObject.SetActive(true);
+            closeButton.interactable = true;
+        }
+
+        foreach (var btn in answerButtons)
+        {
+            btn.interactable = false;
+        }
+
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(false);
     }
 
-    IEnumerator CloseQuizAfterDelay(float delay)
+    void CloseQuiz()
     {
-        yield return new WaitForSeconds(delay);
-
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
         quizPanel.SetActive(false);
         resultText.gameObject.SetActive(false);
+        closeButton.gameObject.SetActive(false);
         SetPlayerControl(true);
         isQuizActive = false;
+
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(false);
     }
 
     void SetPlayerControl(bool enable)

@@ -3,7 +3,17 @@ guid: 9b5c0ab4fd84a1846bb8002607f329ea
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.005
+    second: {fileID: 2100000, guid: b47ce561c914c2147a324dea9d232e7f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: washer_cover
+    second: {fileID: 2100000, guid: 20060e00b3d166e47828d9221ac24e7a, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

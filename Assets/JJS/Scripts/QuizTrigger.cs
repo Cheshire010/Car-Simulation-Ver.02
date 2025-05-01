@@ -3,7 +3,6 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-
 public class QuizTrigger : MonoBehaviour, TireScene_RayCast.IInteractable
 {
     [System.Serializable]
@@ -19,6 +18,8 @@ public class QuizTrigger : MonoBehaviour, TireScene_RayCast.IInteractable
     public Text questionText;
     public Button[] answerButtons;
     public Text resultText;
+    public Button closeButton;
+    public Text feedbackText; // 정답/오답 피드백 텍스트
 
     [Header("문제 데이터")]
     public List<QuizQuestion> questionPool = new List<QuizQuestion>();
@@ -27,38 +28,40 @@ public class QuizTrigger : MonoBehaviour, TireScene_RayCast.IInteractable
     public TireScene_PlayerMove playerController;
     public TireScene_RayCast raycastInteractor;
 
+    [Header("피드백 설정")]
+    public float feedbackDuration = 1.0f; // 피드백 표시 시간
+
     private List<QuizQuestion> selectedQuestions = new List<QuizQuestion>();
     private int currentQuestionIndex = 0;
     private int score = 0;
     private bool isQuizActive = false;
+    private Coroutine feedbackCoroutine;
 
     void Start()
     {
         quizPanel.SetActive(false);
         resultText.gameObject.SetActive(false);
+        closeButton.gameObject.SetActive(false);
+
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(false);
 
         if (playerController == null)
-        {
             playerController = FindObjectOfType<TireScene_PlayerMove>();
-            if (playerController == null)
-                Debug.LogWarning("PlayerMove 컴포넌트를 찾을 수 없습니다!");
-        }
 
         if (raycastInteractor == null)
-        {
             raycastInteractor = FindObjectOfType<TireScene_RayCast>();
-            if (raycastInteractor == null)
-                Debug.LogWarning("RaycastInteractor 컴포넌트를 찾을 수 없습니다!");
-        }
 
         for (int i = 0; i < answerButtons.Length; i++)
         {
             int index = i;
             answerButtons[i].onClick.AddListener(() => CheckAnswer(index));
         }
+
+        closeButton.onClick.AddListener(CloseQuiz);
     }
 
-    public void Interact() // IInteractable 구현
+    public void Interact()
     {
         if (!isQuizActive)
         {
@@ -78,21 +81,22 @@ public class QuizTrigger : MonoBehaviour, TireScene_RayCast.IInteractable
 
         quizPanel.SetActive(true);
         resultText.gameObject.SetActive(false);
+        closeButton.gameObject.SetActive(false);
         SetPlayerControl(false);
+
+        foreach (var btn in answerButtons)
+            btn.interactable = true;
+
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(false);
 
         ShowNextQuestion();
     }
 
     List<QuizQuestion> GetRandomQuestions(int count)
     {
-        if (questionPool.Count < count)
-        {
-            Debug.LogError($"최소 {count}개 이상의 문제가 필요합니다!");
-            return new List<QuizQuestion>();
-        }
-
-        List<QuizQuestion> tempList = new List<QuizQuestion>(questionPool);
         List<QuizQuestion> selected = new List<QuizQuestion>();
+        List<QuizQuestion> tempList = new List<QuizQuestion>(questionPool);
 
         for (int i = 0; i < count; i++)
         {
@@ -117,25 +121,60 @@ public class QuizTrigger : MonoBehaviour, TireScene_RayCast.IInteractable
         for (int i = 0; i < answerButtons.Length; i++)
         {
             answerButtons[i].GetComponentInChildren<Text>().text = currentQuestion.answers[i];
+            answerButtons[i].interactable = true;
         }
+
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(false);
 
         currentQuestionIndex++;
     }
 
-    void CheckAnswer(int selectedIndex) // 오류 수정 확인
+    void CheckAnswer(int selectedIndex)
     {
         QuizQuestion currentQuestion = selectedQuestions[currentQuestionIndex - 1];
 
-        if (selectedIndex == currentQuestion.correctIndex)
+        bool isCorrect = (selectedIndex == currentQuestion.correctIndex);
+        if (isCorrect)
         {
             score++;
-            Debug.Log("정답!");
+            ShowFeedback("정답!", Color.green);
         }
         else
         {
-            Debug.Log("오답!");
+            ShowFeedback("오답!", Color.red);
         }
 
+        foreach (var btn in answerButtons)
+            btn.interactable = false;
+
+        StartCoroutine(NextQuestionAfterDelay(feedbackDuration));
+    }
+
+    void ShowFeedback(string message, Color color)
+    {
+        if (feedbackText == null) return;
+
+        if (feedbackCoroutine != null)
+            StopCoroutine(feedbackCoroutine);
+
+        feedbackCoroutine = StartCoroutine(ShowFeedbackCoroutine(message, color));
+    }
+
+    IEnumerator ShowFeedbackCoroutine(string message, Color color)
+    {
+        feedbackText.text = message;
+        feedbackText.color = color;
+        feedbackText.gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(feedbackDuration);
+
+        feedbackText.gameObject.SetActive(false);
+    }
+
+    IEnumerator NextQuestionAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
         ShowNextQuestion();
     }
 
@@ -143,32 +182,36 @@ public class QuizTrigger : MonoBehaviour, TireScene_RayCast.IInteractable
     {
         resultText.text = $"점수: {score}/{selectedQuestions.Count}";
         resultText.gameObject.SetActive(true);
-        StartCoroutine(CloseQuizAfterDelay(3f));
+        closeButton.gameObject.SetActive(true);
+
+        foreach (var btn in answerButtons)
+            btn.interactable = false;
+
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(false);
     }
 
-    IEnumerator CloseQuizAfterDelay(float delay)
+    void CloseQuiz()
     {
-        yield return new WaitForSeconds(delay);
-
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
         quizPanel.SetActive(false);
         resultText.gameObject.SetActive(false);
+        closeButton.gameObject.SetActive(false);
         SetPlayerControl(true);
         isQuizActive = false;
+
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(false);
     }
 
     void SetPlayerControl(bool enable)
     {
         if (playerController != null)
             playerController.enabled = enable;
-        else
-            Debug.LogWarning("PlayerMove 참조 없음");
 
         if (raycastInteractor != null)
             raycastInteractor.enabled = enable;
-        else
-            Debug.LogWarning("RaycastInteractor 참조 없음");
     }
 }
