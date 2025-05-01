@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Events;
 using System.Collections;
 using static JYJ_RaycastInteractor;
 
@@ -11,18 +11,19 @@ public class JYJ_InteractionEnbayCap : MonoBehaviour, IInteractable
     private bool canInteract = true;
     private bool isHoodOpen = false;
 
-    [Header("UI 설정")]
-    public GameObject chatPanel;
-    public Text messageText;
-    public string openMessage = "후드가 열렸습니다!"; // 단일 텍스트로 변경
-    public float messageDuration = 2.0f;
+    [Header("채팅 설정")]
+    public JYJ_ChatManager chatManager;
+    public string[] useItemDialogue = {
+        "후드가 열렸습니다!",
+        "차량 부품을 확인할 수 있습니다.",
+        "세척을 시작하세요."
+    };
 
-    [Header("사운드 설정")]
+    [Header("사운드 설정")] // 추가된 부분
     public AudioSource audioSource;
     public AudioClip[] soundClips;
 
     private bool isFirstOpen = true;
-    private bool isDialogueActive = false;
 
     public void Interact()
     {
@@ -44,60 +45,32 @@ public class JYJ_InteractionEnbayCap : MonoBehaviour, IInteractable
     {
         if (isFirstOpen && isHoodOpen)
         {
-            StartCoroutine(ShowDialogue());
+            // 수정된 부분: this 참조 전달
+            chatManager.StartChat(useItemDialogue);
             isFirstOpen = false;
         }
     }
 
-    IEnumerator ShowDialogue()
+    // 추가된 사운드 제어 메서드
+    public void PlayChatSound(int index)
     {
-        SetActiveRecursively(chatPanel, true);
-        SetActiveRecursively(messageText.gameObject, true);
+        if (audioSource.isPlaying)
+            audioSource.Stop();
 
-        isDialogueActive = true;
-        messageText.text = openMessage;
-        messageText.enabled = true; //  텍스트 컴포넌트 활성화 추가
-
-        // 사운드 재생 로직
-        foreach (var clip in soundClips)
-        {
-            if (clip == null) continue;
-            AudioSource tempSource = gameObject.AddComponent<AudioSource>();
-            tempSource.clip = clip;
-            tempSource.Play();
-            Destroy(tempSource, clip.length);
-        }
-
-        float timer = 0f;
-        while (timer < messageDuration)
-        {
-            if (Input.GetKeyDown(KeyCode.Space)) break;
-            timer += Time.deltaTime;
-            yield return null;
-        }
-
-        SetActiveRecursively(chatPanel, false);
-        SetActiveRecursively(messageText.gameObject, false);
-        isDialogueActive = false;
+        if (soundClips != null && index < soundClips.Length)
+            audioSource.PlayOneShot(soundClips[index]);
     }
 
-
+    public void StopAllSounds()
+    {
+        if (audioSource.isPlaying)
+            audioSource.Stop();
+    }
 
     IEnumerator InteractionCooldown()
     {
         canInteract = false;
         yield return new WaitForSeconds(interactionCooldown);
         canInteract = true;
-    }
-
-    // 모든 자식 오브젝트 활성화/비활성화 함수
-    void SetActiveRecursively(GameObject obj, bool active)
-    {
-        if (obj == null) return;
-        obj.SetActive(active);
-        foreach (Transform child in obj.transform)
-        {
-            SetActiveRecursively(child.gameObject, active);
-        }
     }
 }
