@@ -55,25 +55,35 @@ public class JYJ_InteractionEnbayCap : MonoBehaviour, IInteractable
         SetActiveRecursively(messageText.gameObject, true);
 
         isDialogueActive = true;
-        messageText.text = openMessage;
+        
         messageText.enabled = true; //  텍스트 컴포넌트 활성화 추가
 
         // 사운드 재생 로직
-        foreach (var clip in soundClips)
+        for (int i = 0; i < soundClips.Length; i++)
         {
+            var clip = soundClips[i];
             if (clip == null) continue;
-            AudioSource tempSource = gameObject.AddComponent<AudioSource>();
-            tempSource.clip = clip;
-            tempSource.Play();
-            Destroy(tempSource, clip.length);
-        }
+            messageText.text = openMessage;
+            audioSource.clip = clip;
+            audioSource.Play();
 
-        float timer = 0f;
-        while (timer < messageDuration)
-        {
-            if (Input.GetKeyDown(KeyCode.Space)) break;
-            timer += Time.deltaTime;
-            yield return null;
+            float timer = 0f;
+            bool skipped = false;
+
+            while (timer < messageDuration)
+            {
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    skipped = true;
+                    break;
+                }
+                timer += Time.deltaTime;
+                yield return null;
+            }
+            if (audioSource.isPlaying)
+            {
+                audioSource.Stop();
+            }
         }
 
         SetActiveRecursively(chatPanel, false);

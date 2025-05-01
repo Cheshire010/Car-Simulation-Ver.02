@@ -11011,8 +11011,7 @@ MonoBehaviour:
   chatText: {fileID: 8614184819021206499}
   pressText: {fileID: 1092657088111091046}
   chatMessages:
-  - gd
-  - q2
+  - "\uC544\uC9C1 \uC900\uBE44\uC911\uC785\uB2C8\uB2E4 \u3160\u3160\u3160"
   soundClips:
   - {fileID: 8300000, guid: cf7dd099bd7fb094f93d4530784491ea, type: 3}
   - {fileID: 8300000, guid: cf7dd099bd7fb094f93d4530784491ea, type: 3}
@@ -14793,7 +14792,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  mouseSensitivity: 1500
+  mouseSensitivity: 250
   jumpForce: 0
 --- !u!1 &8707273952894849149
 GameObject:
