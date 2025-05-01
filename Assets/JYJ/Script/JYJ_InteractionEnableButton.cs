@@ -20,6 +20,14 @@ public class JYJ_InteractionEnableButton : MonoBehaviour, IInteractable
     public AudioSource audioSource;
     public AudioClip[] sounds;
 
+    [Header("유도 효과 설정")]
+    [SerializeField] private Color[] glowColors = { Color.red, Color.white }; // 빨강-흰색으로 초기화
+    [SerializeField] private float blinkInterval = 0.5f; // 깜빡임 간격
+    [SerializeField] private float emissionIntensity = 2f;
+    private Material materialInstance;
+    private Renderer objectRenderer;
+    private Coroutine glowCoroutine;
+
     private bool canInteract = true;
     private bool hasOpened = false;
     private Coroutine messageCoroutine = null;
@@ -32,29 +40,49 @@ public class JYJ_InteractionEnableButton : MonoBehaviour, IInteractable
     {
         if (!canInteract || hasOpened) return;
 
+        if (glowCoroutine != null)
+        {
+            StopCoroutine(glowCoroutine);
+            glowCoroutine = null;
+        }
+
+        if (materialInstance != null)
+        {
+            materialInstance.SetColor("_EmissionColor", Color.white);
+        }
+
         canInteract = false;
         hasOpened = true;
 
         PlayOpenAnimation();
         StartCoroutine(InteractionCooldown());
 
-        // 패널과 모든 자식 활성화
         if (chatPanel != null)
             SetActiveRecursively(chatPanel, true);
 
         if (messageText != null)
         {
             messageText.gameObject.SetActive(true);
-            if (messageCoroutine != null)
-                StopCoroutine(messageCoroutine);
             messageCoroutine = StartCoroutine(ShowMessage(openMessage));
         }
         PlaySounds();
 
-        if (OnEnabled != null)
-            OnEnabled();
+        OnEnabled?.Invoke();
     }
+    void Start()
+    {
+        objectRenderer = GetComponent<Renderer>();
+        if (objectRenderer != null)
+        {
+            materialInstance = new Material(objectRenderer.material);
+            objectRenderer.material = materialInstance;
+        }
 
+        if (!hasOpened)
+        {
+            glowCoroutine = StartCoroutine(BlinkEffect());
+        }
+    }
     void Update()
     {
         if (isMessageActive && Input.GetKeyDown(KeyCode.Space))
@@ -87,7 +115,21 @@ public class JYJ_InteractionEnableButton : MonoBehaviour, IInteractable
             }
         }
     }
-
+    private IEnumerator BlinkEffect()
+    {
+        int colorIndex = 0;
+        while (true)
+        {
+            if (materialInstance != null && glowColors.Length >= 2)
+            {
+                materialInstance.EnableKeyword("_EMISSION");
+                Color currentColor = glowColors[colorIndex % 2];
+                materialInstance.SetColor("_EmissionColor", currentColor * emissionIntensity);
+                colorIndex++;
+            }
+            yield return new WaitForSeconds(blinkInterval);
+        }
+    }
     IEnumerator ShowMessage(string message)
     {
         messageText.text = message;

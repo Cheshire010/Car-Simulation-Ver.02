@@ -24,11 +24,117 @@ public class JYJ_InteractWash : MonoBehaviour, IInteractable
     public AudioSource audioSource;
     public AudioClip[] soundClips;
 
+    [Header("깜빡임 설정")]
+    [SerializeField] private float blinkInterval = 0.5f;
+    [SerializeField] private Color blinkColor = Color.red;
+    [SerializeField] private float emissionIntensity = 2f;
+
     private Coroutine messageCoroutine;
     private bool isMessageActive = false;
 
+    // 깜빡임 관련 변수
+    private Renderer objectRenderer;
+    private Material[] materialInstances;
+    private Color[] originalEmissionColors;
+    private Coroutine blinkCoroutine;
+    private bool isBlinking = false;
+
+    void OnEnable()
+    {
+        InitBlinkMaterials();
+        StartBlinking();
+    }
+
+    void OnDisable()
+    {
+        StopBlinking();
+        RestoreOriginalEmissionColors();
+    }
+
+    void InitBlinkMaterials()
+    {
+        objectRenderer = GetComponent<Renderer>();
+        if (objectRenderer != null)
+        {
+            Material[] originalMats = objectRenderer.materials;
+            materialInstances = new Material[originalMats.Length];
+            originalEmissionColors = new Color[originalMats.Length];
+            for (int i = 0; i < originalMats.Length; i++)
+            {
+                materialInstances[i] = new Material(originalMats[i]);
+                if (materialInstances[i].HasProperty("_EmissionColor"))
+                {
+                    originalEmissionColors[i] = materialInstances[i].GetColor("_EmissionColor");
+                    materialInstances[i].EnableKeyword("_EMISSION");
+                }
+                else
+                {
+                    originalEmissionColors[i] = Color.black;
+                }
+            }
+            objectRenderer.materials = materialInstances;
+        }
+    }
+
+    void StartBlinking()
+    {
+        if (!isBlinking && materialInstances != null)
+        {
+            blinkCoroutine = StartCoroutine(BlinkEffect());
+            isBlinking = true;
+        }
+    }
+
+    void StopBlinking()
+    {
+        if (blinkCoroutine != null)
+        {
+            StopCoroutine(blinkCoroutine);
+            blinkCoroutine = null;
+        }
+        isBlinking = false;
+    }
+
+    void RestoreOriginalEmissionColors()
+    {
+        if (materialInstances != null && originalEmissionColors != null)
+        {
+            for (int i = 0; i < materialInstances.Length; i++)
+            {
+                if (materialInstances[i].HasProperty("_EmissionColor"))
+                {
+                    materialInstances[i].SetColor("_EmissionColor", originalEmissionColors[i]);
+                }
+            }
+        }
+    }
+
+    private IEnumerator BlinkEffect()
+    {
+        int state = 0;
+        while (true)
+        {
+            for (int i = 0; i < materialInstances.Length; i++)
+            {
+                if (materialInstances[i].HasProperty("_EmissionColor"))
+                {
+                    Color targetEmission = (state % 2 == 0)
+                        ? blinkColor * emissionIntensity
+                        : originalEmissionColors[i];
+                    materialInstances[i].SetColor("_EmissionColor", targetEmission);
+                }
+            }
+            state++;
+            yield return new WaitForSeconds(blinkInterval);
+        }
+    }
+
     public void Interact()
     {
+        // 깜빡임 중지 및 원래 색상 복구
+        StopBlinking();
+        RestoreOriginalEmissionColors();
+
         if (washerAnimator == null)
             washerAnimator = GetComponent<Animator>();
 
@@ -51,15 +157,10 @@ public class JYJ_InteractWash : MonoBehaviour, IInteractable
 
         if (messageCoroutine != null) StopCoroutine(messageCoroutine);
         messageCoroutine = StartCoroutine(ShowMessages());
-
-        // 기존 활성화 코드 제거
-        // if (tableObject != null) tableObject.SetActive(true);
-        // gameObject.SetActive(false);
     }
 
     IEnumerator ShowMessages()
     {
-        Debug.Log("ShowMessages 시작");
         SetActiveRecursively(chatPanel, true);
         if (messageText != null)
         {
@@ -69,7 +170,6 @@ public class JYJ_InteractWash : MonoBehaviour, IInteractable
 
         isMessageActive = true;
 
-        // ▼▼▼ 핵심 로직 개선 ▼▼▼
         for (int i = 0; i < completionMessage.Length; i++)
         {
             messageText.text = completionMessage[i];
@@ -78,40 +178,30 @@ public class JYJ_InteractWash : MonoBehaviour, IInteractable
             bool spacePressed = false;
             float timer = 0;
 
-            // 3초 대기 또는 스페이스 입력 감지
             while (timer < 3f && !spacePressed)
             {
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    Debug.Log("스페이스 입력 감지");
                     spacePressed = true;
                 }
                 timer += Time.deltaTime;
                 yield return null;
             }
 
-            // 마지막 메시지에서 스페이스 입력 시 즉시 종료
             if (i == completionMessage.Length - 1 && spacePressed)
             {
                 break;
             }
         }
-        // ▲▲▲ 수정 완료 ▲▲▲
 
         EndMessage();
     }
 
-
     void EndMessage()
     {
-        if (!isMessageActive)
-        {
-            Debug.Log("EndMessage: 이미 비활성화 상태");
-            return;
-        }
+        if (!isMessageActive) return;
         isMessageActive = false;
 
-        Debug.Log("패널 및 텍스트 비활성화");
         SetActiveRecursively(chatPanel, false);
         if (messageText != null)
         {
@@ -120,9 +210,8 @@ public class JYJ_InteractWash : MonoBehaviour, IInteractable
             messageText.gameObject.SetActive(false);
         }
 
-        // 채팅 종료 후 오브젝트 활성화/비활성화
         if (tableObject != null) tableObject.SetActive(true);
-        gameObject.SetActive(false); // 현재 오브젝트 비활성화
+        gameObject.SetActive(false);
 
         if (messageCoroutine != null)
         {
@@ -131,7 +220,6 @@ public class JYJ_InteractWash : MonoBehaviour, IInteractable
         }
     }
 
-    // 모든 자식 오브젝트 활성화/비활성화 함수
     void SetActiveRecursively(GameObject obj, bool active)
     {
         if (obj == null) return;

@@ -6,7 +6,7 @@ public class JYJ_LeftClickDisappear : MonoBehaviour, JYJ_RaycastInteractor.IInte
     public GameObject targetObject; // 활성화할 오브젝트
 
     public void Interact()
-    {
+    {   
         // 자신을 비활성화
         gameObject.SetActive(false);
 

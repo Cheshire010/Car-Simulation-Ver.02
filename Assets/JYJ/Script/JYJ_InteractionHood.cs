@@ -27,7 +27,7 @@ public class JYJ_InteractionHood : MonoBehaviour, IInteractable
         if (Input.GetMouseButtonDown(0))
         {
             if (!canInteract) return;
-            ToggleHood();
+            OpenHoodOnce();
             StartCoroutine(InteractionCooldown());
         }
     }
@@ -41,30 +41,28 @@ public class JYJ_InteractionHood : MonoBehaviour, IInteractable
         }
     }
 
-    void ToggleHood()
+    void OpenHoodOnce()
     {
-        isHoodOpen = !isHoodOpen;
-        hoodAnimator.SetTrigger(isHoodOpen ? "Open" : "Close");
+        if (isHoodOpen) return; // 이미 열렸으면 무시
+        isHoodOpen = true;
+        if (hoodAnimator != null)
+            hoodAnimator.SetTrigger("Open");
 
-        // 최초 열림 시에만 출력
-        if (isHoodOpen)
+        // 패널과 모든 자식 활성화
+        if (chatPanel != null) SetActiveRecursively(chatPanel, true);
+        if (messageText != null)
         {
-            // 패널과 모든 자식 활성화
-            if (chatPanel != null) SetActiveRecursively(chatPanel, true);
-            if (messageText != null)
-            {
-                messageText.gameObject.SetActive(true);
-                if (messageCoroutine != null) StopCoroutine(messageCoroutine);
-                messageCoroutine = StartCoroutine(ShowMessage(openMessage));
-            }
+            messageText.gameObject.SetActive(true);
+            if (messageCoroutine != null) StopCoroutine(messageCoroutine);
+            messageCoroutine = StartCoroutine(ShowMessage(openMessage));
+        }
 
-            // 사운드 재생
-            if (audioSource != null && sounds != null)
+        // 사운드 재생
+        if (audioSource != null && sounds != null)
+        {
+            foreach (var clip in sounds)
             {
-                foreach (var clip in sounds)
-                {
-                    audioSource.PlayOneShot(clip);
-                }
+                audioSource.PlayOneShot(clip);
             }
         }
     }
