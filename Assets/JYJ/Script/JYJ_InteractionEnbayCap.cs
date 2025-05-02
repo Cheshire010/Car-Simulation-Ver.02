@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using static JYJ_RaycastInteractor;
+using UnityEngine.Events;
 
 public class JYJ_InteractionEnbayCap : MonoBehaviour, IInteractable
 {
@@ -14,30 +15,93 @@ public class JYJ_InteractionEnbayCap : MonoBehaviour, IInteractable
     [Header("UI 설정")]
     public GameObject chatPanel;
     public Text messageText;
-    public string openMessage = "후드가 열렸습니다!"; // 단일 텍스트로 변경
+    public string openMessage = "후드가 열렸습니다!";
     public float messageDuration = 2.0f;
 
     [Header("사운드 설정")]
     public AudioSource audioSource;
     public AudioClip[] soundClips;
 
+    [Header("유도 효과 설정")]
+    [SerializeField] private Color[] glowColors = { Color.red, Color.white };
+    [SerializeField] private float blinkInterval = 0.5f;
+    [SerializeField] private float emissionIntensity = 2f;
+    private Material[] materialInstances;
+    private Renderer objectRenderer;
+    private Coroutine glowCoroutine;
+
     private bool isFirstOpen = true;
     private bool isDialogueActive = false;
+
+    public JYJ_BlinkOnInteract blinkTarget;
+    void Start()
+    {
+        objectRenderer = GetComponent<Renderer>();
+        if (objectRenderer != null)
+        {
+            Material[] originalMats = objectRenderer.materials;
+            materialInstances = new Material[originalMats.Length];
+            for (int i = 0; i < originalMats.Length; i++)
+            {
+                materialInstances[i] = new Material(originalMats[i]);
+            }
+            objectRenderer.materials = materialInstances;
+            glowCoroutine = StartCoroutine(BlinkEffect());
+        }
+        else
+        {
+            Debug.LogWarning("Renderer 컴포넌트가 없습니다.", this);
+        }
+    }
 
     public void Interact()
     {
         if (Input.GetMouseButtonDown(0) && canInteract)
         {
-            ToggleHood();
+            // 깜빡임 중지 및 모든 머티리얼을 흰색으로 초기화
+            if (glowCoroutine != null)
+            {
+                StopCoroutine(glowCoroutine);
+                foreach (var mat in materialInstances)
+                {
+                    mat.EnableKeyword("_EMISSION");
+                    mat.SetColor("_EmissionColor", Color.white * emissionIntensity);
+                }
+            }
+
+            OpenHoodOnce();
             TriggerUseItemEvent();
             StartCoroutine(InteractionCooldown());
         }
+        if (blinkTarget != null)
+            blinkTarget.Interact();
     }
 
-    void ToggleHood()
+    private IEnumerator BlinkEffect()
     {
-        isHoodOpen = !isHoodOpen;
-        hoodAnimator.SetTrigger(isHoodOpen ? "Open" : "Close");
+        int colorIndex = 0;
+        while (true)
+        {
+            if (materialInstances != null)
+            {
+                Color targetColor = glowColors[colorIndex % glowColors.Length];
+                foreach (var mat in materialInstances)
+                {
+                    mat.EnableKeyword("_EMISSION");
+                    mat.SetColor("_EmissionColor", targetColor * emissionIntensity);
+                }
+                colorIndex++;
+            }
+            yield return new WaitForSeconds(blinkInterval);
+        }
+    }
+
+    void OpenHoodOnce()
+    {
+        if (isHoodOpen) return;
+        isHoodOpen = true;
+        if (hoodAnimator != null)
+            hoodAnimator.SetTrigger("Open");
     }
 
     void TriggerUseItemEvent()
@@ -55,10 +119,9 @@ public class JYJ_InteractionEnbayCap : MonoBehaviour, IInteractable
         SetActiveRecursively(messageText.gameObject, true);
 
         isDialogueActive = true;
-        
-        messageText.enabled = true; //  텍스트 컴포넌트 활성화 추가
 
-        // 사운드 재생 로직
+        messageText.enabled = true;
+
         for (int i = 0; i < soundClips.Length; i++)
         {
             var clip = soundClips[i];
@@ -68,13 +131,11 @@ public class JYJ_InteractionEnbayCap : MonoBehaviour, IInteractable
             audioSource.Play();
 
             float timer = 0f;
-            bool skipped = false;
 
             while (timer < messageDuration)
             {
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    skipped = true;
                     break;
                 }
                 timer += Time.deltaTime;
@@ -91,8 +152,6 @@ public class JYJ_InteractionEnbayCap : MonoBehaviour, IInteractable
         isDialogueActive = false;
     }
 
-
-
     IEnumerator InteractionCooldown()
     {
         canInteract = false;
@@ -100,7 +159,6 @@ public class JYJ_InteractionEnbayCap : MonoBehaviour, IInteractable
         canInteract = true;
     }
 
-    // 모든 자식 오브젝트 활성화/비활성화 함수
     void SetActiveRecursively(GameObject obj, bool active)
     {
         if (obj == null) return;
@@ -108,6 +166,29 @@ public class JYJ_InteractionEnbayCap : MonoBehaviour, IInteractable
         foreach (Transform child in obj.transform)
         {
             SetActiveRecursively(child.gameObject, active);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (materialInstances != null)
+        {
+            foreach (var mat in materialInstances)
+            {
+                mat.EnableKeyword("_EMISSION");
+                mat.SetColor("_EmissionColor", Color.white * emissionIntensity);
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (materialInstances != null)
+        {
+            foreach (var mat in materialInstances)
+            {
+                Destroy(mat);
+            }
         }
     }
 }

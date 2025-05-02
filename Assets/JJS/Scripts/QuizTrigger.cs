@@ -18,7 +18,8 @@ public class QuizTrigger : MonoBehaviour, TireScene_RayCast.IInteractable
     public Text questionText;
     public Button[] answerButtons;
     public Text resultText;
-    public Button closeButton; // 종료 버튼 추가
+    public Button closeButton;
+    public Text feedbackText; // 정답/오답 피드백 텍스트
 
     [Header("문제 데이터")]
     public List<QuizQuestion> questionPool = new List<QuizQuestion>();
@@ -27,16 +28,23 @@ public class QuizTrigger : MonoBehaviour, TireScene_RayCast.IInteractable
     public TireScene_PlayerMove playerController;
     public TireScene_RayCast raycastInteractor;
 
+    [Header("피드백 설정")]
+    public float feedbackDuration = 1.0f; // 피드백 표시 시간
+
     private List<QuizQuestion> selectedQuestions = new List<QuizQuestion>();
     private int currentQuestionIndex = 0;
     private int score = 0;
     private bool isQuizActive = false;
+    private Coroutine feedbackCoroutine;
 
     void Start()
     {
         quizPanel.SetActive(false);
         resultText.gameObject.SetActive(false);
-        closeButton.gameObject.SetActive(false); // 종료 버튼 초기 비활성화
+        closeButton.gameObject.SetActive(false);
+
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(false);
 
         if (playerController == null)
             playerController = FindObjectOfType<TireScene_PlayerMove>();
@@ -50,7 +58,7 @@ public class QuizTrigger : MonoBehaviour, TireScene_RayCast.IInteractable
             answerButtons[i].onClick.AddListener(() => CheckAnswer(index));
         }
 
-        closeButton.onClick.AddListener(CloseQuiz); // 종료 버튼 리스너 등록
+        closeButton.onClick.AddListener(CloseQuiz);
     }
 
     public void Interact()
@@ -73,12 +81,14 @@ public class QuizTrigger : MonoBehaviour, TireScene_RayCast.IInteractable
 
         quizPanel.SetActive(true);
         resultText.gameObject.SetActive(false);
-        closeButton.gameObject.SetActive(false); // 종료 버튼 숨김
+        closeButton.gameObject.SetActive(false);
         SetPlayerControl(false);
 
-        // 버튼 재활성화
         foreach (var btn in answerButtons)
             btn.interactable = true;
+
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(false);
 
         ShowNextQuestion();
     }
@@ -111,7 +121,11 @@ public class QuizTrigger : MonoBehaviour, TireScene_RayCast.IInteractable
         for (int i = 0; i < answerButtons.Length; i++)
         {
             answerButtons[i].GetComponentInChildren<Text>().text = currentQuestion.answers[i];
+            answerButtons[i].interactable = true;
         }
+
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(false);
 
         currentQuestionIndex++;
     }
@@ -120,16 +134,47 @@ public class QuizTrigger : MonoBehaviour, TireScene_RayCast.IInteractable
     {
         QuizQuestion currentQuestion = selectedQuestions[currentQuestionIndex - 1];
 
-        if (selectedIndex == currentQuestion.correctIndex)
+        bool isCorrect = (selectedIndex == currentQuestion.correctIndex);
+        if (isCorrect)
         {
             score++;
-            Debug.Log("정답!");
+            ShowFeedback("정답!", Color.green);
         }
         else
         {
-            Debug.Log("오답!");
+            ShowFeedback("오답!", Color.red);
         }
 
+        foreach (var btn in answerButtons)
+            btn.interactable = false;
+
+        StartCoroutine(NextQuestionAfterDelay(feedbackDuration));
+    }
+
+    void ShowFeedback(string message, Color color)
+    {
+        if (feedbackText == null) return;
+
+        if (feedbackCoroutine != null)
+            StopCoroutine(feedbackCoroutine);
+
+        feedbackCoroutine = StartCoroutine(ShowFeedbackCoroutine(message, color));
+    }
+
+    IEnumerator ShowFeedbackCoroutine(string message, Color color)
+    {
+        feedbackText.text = message;
+        feedbackText.color = color;
+        feedbackText.gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(feedbackDuration);
+
+        feedbackText.gameObject.SetActive(false);
+    }
+
+    IEnumerator NextQuestionAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
         ShowNextQuestion();
     }
 
@@ -137,11 +182,13 @@ public class QuizTrigger : MonoBehaviour, TireScene_RayCast.IInteractable
     {
         resultText.text = $"점수: {score}/{selectedQuestions.Count}";
         resultText.gameObject.SetActive(true);
-        closeButton.gameObject.SetActive(true); // 종료 버튼 활성화
+        closeButton.gameObject.SetActive(true);
 
-        // 버튼 비활성화
         foreach (var btn in answerButtons)
             btn.interactable = false;
+
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(false);
     }
 
     void CloseQuiz()
@@ -154,6 +201,9 @@ public class QuizTrigger : MonoBehaviour, TireScene_RayCast.IInteractable
         closeButton.gameObject.SetActive(false);
         SetPlayerControl(true);
         isQuizActive = false;
+
+        if (feedbackText != null)
+            feedbackText.gameObject.SetActive(false);
     }
 
     void SetPlayerControl(bool enable)

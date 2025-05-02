@@ -159,6 +159,7 @@ RectTransform:
   - {fileID: 1606693843}
   - {fileID: 2137437187}
   - {fileID: 1105047987}
+  - {fileID: 1277101067}
   m_Father: {fileID: 3916756573792201396}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -259,7 +260,7 @@ MonoBehaviour:
     \uCC44\uC6B0\uC138\uC694"
   completeMessages:
   - "\uD0C0\uC774\uC5B4\uC758 \uC801\uC815 \uACF5\uAE30\uC555\uC740 70~80% \uC785\uB2C8\uB2E4"
-  - "\uC55E\uCABD\uC73C\uB85C \uC774\uB3D9\uD558\uC154\uC11C \uD034\uC988\uB97C \uD480\uC5B4\uC8FC\uC138\uC694"
+  - "\uD0C1\uC790 \uC55E\uC73C\uB85C \uAC00\uC154\uC11C \uD034\uC988\uB97C \uD480\uC5B4\uC8FC\uC138\uC694"
   activateOnComplete: {fileID: 2135543107}
 --- !u!1 &357063326
 GameObject:
@@ -1704,6 +1705,85 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.0007038079, y: 0.08588572, z: 0.035105485}
   m_Center: {x: -0.039937913, y: 0.0077444525, z: 0.01750051}
+--- !u!1 &1277101064
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1277101067}
+  - component: {fileID: 1277101066}
+  - component: {fileID: 1277101065}
+  m_Layer: 5
+  m_Name: OX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1277101065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1277101064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: a2e6159457453a34b8a876d86d894573, type: 3}
+    m_FontSize: 50
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 0
+    m_MaxSize: 100
+    m_Alignment: 4
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: New Text
+--- !u!222 &1277101066
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1277101064}
+  m_CullTransparentMesh: 1
+--- !u!224 &1277101067
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1277101064}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.2500001, y: 1.2500001, z: 1.2500001}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 211793262}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 254, y: 332}
+  m_SizeDelta: {x: 289, y: 130}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1346778843
 GameObject:
   m_ObjectHideFlags: 0
@@ -2576,7 +2656,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2135543107}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4e42532d0c441a42922a71b437e7df4, type: 3}
+  m_Script: {fileID: 11500000, guid: 2179bdbe11b8c86458025ecb92405c43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   quizPanel: {fileID: 211793261}
@@ -2588,41 +2668,33 @@ MonoBehaviour:
   - {fileID: 1606693846}
   resultText: {fileID: 2137437185}
   closeButton: {fileID: 1105047984}
+  feedbackText: {fileID: 1277101065}
   questionPool:
   - question: "\uD0C0\uC774\uC5B4 \uACF5\uAE30\uC555 \uAD00\uB9AC\uC758 \uC8FC\uC694
       \uBAA9\uC801\uC774 \uC544\uB2CC \uAC83\uC740 \uBB34\uC5C7\uC778\uAC00\uC694?"
     answers:
     - "\uC5F0\uBE44 \uD5A5\uC0C1"
-    - "\uD0C0\uC774\uC5B4\uC758 \uC218\uBA85 \uC5F0\uC7A5"
+    - "\uD0C0\uC774\uC5B4 \uC218\uBA85 \uC5F0\uC7A5"
     - "\uCC28\uB7C9 \uC81C\uC5B4 \uB2A5\uB825 \uD5A5\uC0C1"
     - "\uC5D4\uC9C4 \uCD9C\uB825 \uAC15\uD654"
     correctIndex: 3
-  - question: "\uACF5\uAE30\uC555\uC774 \uB108\uBB34 \uB192\uC73C\uBA74 \uC5B4\uB5A4
-      \uBB38\uC81C\uAC00 \uC0DD\uAE38 \uC218 \uC788\uB098\uC694?"
+  - question: "\uD0C0\uC774\uC5B4 \uACF5\uAE30\uC555\uC774 \uB108\uBB34 \uB192\uC73C\uBA74
+      \uC5B4\uB5A4 \uBB38\uC81C\uAC00 \uC0DD\uAE38 \uC218 \uC788\uB098\uC694?"
     answers:
-    - "\uD0C0\uC774\uC5B4\uC758 \uC218\uBA85 \uC99D\uAC00"
-    - "\uD0C0\uC774\uC5B4\uC758 \uC811\uC9C0 \uBA74\uC801 \uC99D\uAC00"
+    - "\uD0C0\uC774\uC5B4 \uC218\uBA85 \uC99D\uAC00"
+    - "\uC811\uC9C0 \uBA74\uC801 \uC99D\uAC00"
     - "\uC81C\uB3D9\uB825 \uC57D\uD654"
     - "\uC2B9\uCC28\uAC10 \uD5A5\uC0C1"
     correctIndex: 2
   - question: "\uD0C0\uC774\uC5B4 \uACF5\uAE30\uC555 \uC810\uAC80\uC774 \uAD8C\uC7A5\uB418\uB294
-      \uC2DC\uAE30\uB85C \uC633\uC740\uAC83\uC740?"
+      \uC2DC\uAE30\uB85C \uC633\uC740 \uAC83\uC740?"
     answers:
-    - "\uD55C\uB2EC\uC5D0 \uD55C\uBC88 \uC774\uC0C1"
-    - "1\uB144\uC5D0 \uD55C\uBC88"
-    - "\uD0C0\uC774\uC5B4 \uAD50\uCCB4\uC2DC\uB9CC"
+    - "\uD55C\uB2EC\uC5D0 \uD55C \uBC88 \uC774\uC0C1"
+    - "1\uB144\uC5D0 \uD55C \uBC88"
+    - "\uD0C0\uC774\uC5B4 \uAD50\uCCB4  \uC2DC"
     - "\uC7A5\uAC70\uB9AC \uC8FC\uD589 \uD6C4"
     correctIndex: 0
-  - question: "\uACF5\uAE30\uC555 \uACBD\uACE0\uB4F1(\uD0C0\uC774\uC5B4 \uBAA8\uC591
-      \uBD88)\uC774 \uACC4\uC18D \uB4E4\uC5B4\uC62C \uACBD\uC6B0 \uAC00\uC7A5 \uBA3C\uC800
-      \uD574\uC57C\uD560 \uC77C\uC740?"
-    answers:
-    - "\uBC30\uD130\uB9AC \uAD50\uCCB4"
-    - "\uB77C\uC774\uD2B8 \uC810\uAC80"
-    - "\uD0C0\uC774\uC5B4 \uC190\uC0C1 \uC5EC\uBD80 \uC810\uAC80"
-    - "\uB124\uBE44\uAC8C\uC774\uC158 \uC7AC\uC124\uC815"
-    correctIndex: 2
-  - question: "\uD0C0\uC774\uC5B4\uC758 \uC801\uC815 \uACF5\uAE30\uC555\uC740 \uC5B4\uB514\uC5D0\uC11C
+  - question: "\uD0C0\uC774\uC5B4 \uC801\uC815 \uACF5\uAE30\uC555\uC740 \uC5B4\uB514\uC5D0\uC11C
       \uD655\uC778 \uD560 \uC218 \uC788\uB098\uC694?"
     answers:
     - "\uCC28\uB7C9 \uB4F1\uB85D\uC99D"
@@ -2630,8 +2702,18 @@ MonoBehaviour:
     - "\uC6B4\uC804\uC11D \uACC4\uAE30\uD310"
     - "\uC790\uB3D9\uCC28 \uBCF4\uD5D8\uC99D"
     correctIndex: 1
-  playerController: {fileID: 8699525375594383011}
-  raycastInteractor: {fileID: 8699525375594383010}
+  - question: "\uACF5\uAE30\uC555 \uACBD\uACE0\uB4F1(\uD0C0\uC774\uC5B4 \uBAA8\uC591
+      \uBD88)\uC774 \uACC4\uC18D \uB4E4\uC5B4\uC62C \uACBD\uC6B0 \uAC00\uC7A5 \uBA3C\uC800
+      \uD574\uC57C \uD560 \uC77C\uC740?"
+    answers:
+    - "\uBC30\uD130\uB9AC \uAD50\uCCB4"
+    - "\uB77C\uC774\uD2B8 \uC810\uAC80"
+    - "\uD0C0\uC774\uC5B4 \uC190\uC0C1 \uC810\uAC80"
+    - "\uB124\uBE44\uAC8C\uC774\uC158 \uC7AC\uC124\uC815"
+    correctIndex: 2
+  playerController: {fileID: 0}
+  raycastInteractor: {fileID: 0}
+  feedbackDuration: 1
 --- !u!1 &2135887936
 GameObject:
   m_ObjectHideFlags: 0
@@ -2904,8 +2986,8 @@ MonoBehaviour:
   - "\uC801\uC815 \uACF5\uAE30\uC555\uC744 \uC720\uC9C0\uD558\uB294\uAC83\uC774 \uC911\uC694\uD569\uB2C8\uB2E4"
   - "\uC720\uC9C0 \uC2DC \uD0C0\uC774\uC5B4\uC758 \uC218\uBA85\uC5F0\uC7A5 \uBC0F
     \uC5F0\uBE44\uC808\uAC10\uC774 \uAC00\uB2A5\uD569\uB2C8\uB2E4"
-  - "\uC6C0\uC9C1\uC5EC\uC11C \uACF5\uAE30\uC555 \uC8FC\uC785\uAE30 \uADFC\uCC98\uB85C
-    \uAC00\uC138\uC694"
+  - "\uCC28\uB7C9 \uC624\uB978\uCABD\uC758 \uACF5\uAE30\uC555 \uC8FC\uC785\uAE30
+    \uADFC\uCC98\uB85C \uAC00\uC138\uC694"
   soundClips:
   - {fileID: 8300000, guid: cf7dd099bd7fb094f93d4530784491ea, type: 3}
   - {fileID: 8300000, guid: fdba84c42a86032408c0fcaa7ff2dd66, type: 3}
